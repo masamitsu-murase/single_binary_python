@@ -11,11 +11,11 @@ forgotten) from the programmer.
 #include "Python.h"
 #include "windows.h"
 
-#ifdef Py_ENABLE_SHARED
-
 // Python Globals
 HMODULE PyWin_DLLhModule = NULL;
 const char *PyWin_DLLVersionString = MS_DLL_ID;
+
+#ifdef Py_ENABLE_SHARED
 
 BOOL    WINAPI  DllMain (HANDLE hInst,
                                                 ULONG ul_reason_for_call,
