@@ -100,7 +100,7 @@
       <StackReserveSize Condition="$(Configuration) == 'PGInstrument'">12000000</StackReserveSize>
       <!-- HACK: Need additional memory to avoid crashing until gh-113655 is fixed -->
       <StackReserveSize Condition="$(Configuration) == 'PGUpdate' and $(UseExtraStackReserve) == 'true'">3000000</StackReserveSize>
-      <AdditionalDependencies>pythoncore_static$(PyDebugExt).lib;python314$(PyDebugExt).lib;version.lib;ws2_32.lib;pathcch.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pythoncore_static$(PyDebugExt).lib;python314$(PyDebugExt).lib;_asyncio_builtin$(PyDebugExt).lib;_decimal_builtin$(PyDebugExt).lib;_elementtree_builtin$(PyDebugExt).lib;_multiprocessing_builtin$(PyDebugExt).lib;_overlapped_builtin$(PyDebugExt).lib;_queue_builtin$(PyDebugExt).lib;_remote_debugging_builtin$(PyDebugExt).lib;_socket_builtin$(PyDebugExt).lib;_uuid_builtin$(PyDebugExt).lib;_wmi_builtin$(PyDebugExt).lib;_zoneinfo_builtin$(PyDebugExt).lib;pyexpat_builtin$(PyDebugExt).lib;select_builtin$(PyDebugExt).lib;unicodedata_builtin$(PyDebugExt).lib;winsound_builtin$(PyDebugExt).lib;version.lib;ws2_32.lib;pathcch.lib;bcrypt.lib;iphlpapi.lib;rpcrt4.lib;ole32.lib;oleaut32.lib;propsys.lib;wbemuuid.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="$(IncludeExternals)">zlib-ng$(PyDebugExt).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -124,6 +124,67 @@
     </ProjectReference>
     <ProjectReference Include="zlib-ng.vcxproj" Condition="$(IncludeExternals)">
       <Project>{fb91c8b2-6fbc-3a01-b644-1637111f902d}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <!-- Static builtin extension modules -->
+    <ProjectReference Include="_asyncio.vcxproj">
+      <Project>{384C224A-7474-476E-A01B-750EA7DE918C}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="_decimal.vcxproj">
+      <Project>{0E9791DB-593A-465F-98BC-681011311617}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="_elementtree.vcxproj">
+      <Project>{17E1E049-C309-4D79-843F-AE483C264AEA}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="_multiprocessing.vcxproj">
+      <Project>{9E48B300-37D1-11DD-8C41-005056C00008}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="_overlapped.vcxproj">
+      <Project>{EB6E69DD-04BF-4543-9B92-49FAABCEAC2E}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="_queue.vcxproj">
+      <Project>{78D80A15-BD8C-44E2-B49E-1F05B0A0A687}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="_remote_debugging.vcxproj">
+      <Project>{4D7C112F-3083-4D9E-9754-9341C14D9B39}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="_socket.vcxproj">
+      <Project>{86937F53-C189-40EF-8CE8-8759D8E7D480}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="_uuid.vcxproj">
+      <Project>{CB435430-EBB1-478B-8F4E-C256F6838F55}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="_wmi.vcxproj">
+      <Project>{54B1431F-B86B-4ACB-B28C-88BCF93191D8}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="_zoneinfo.vcxproj">
+      <Project>{FCBE1EF2-E0F0-40B1-88B5-00A35D378742}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="pyexpat.vcxproj">
+      <Project>{D06B6426-4762-44CC-8BAD-D79052507F2F}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="select.vcxproj">
+      <Project>{18CAE28C-B454-46C1-87A0-493D91D97F03}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="unicodedata.vcxproj">
+      <Project>{ECC7CEAC-A5E5-458E-BB9E-2413CC847881}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="winsound.vcxproj">
+      <Project>{28B5D777-DDF2-4B6B-B34F-31D938813856}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
