@@ -60,7 +60,9 @@
       <BuildInParallel>false</BuildInParallel>
     </Projects>
     <!-- python3.dll -->
-    <Projects Include="python3dll.vcxproj" />
+    <Projects Include="python3dll.vcxproj">
+      <BuildInParallel>false</BuildInParallel>
+    </Projects>
     <!-- py[w].exe -->
     <Projects Include="pylauncher.vcxproj;pywlauncher.vcxproj" />
     <!-- pyshellext.dll -->
