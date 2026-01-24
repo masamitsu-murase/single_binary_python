@@ -41,22 +41,22 @@
 
     <!-- Root directory of the repository -->
     <PySourcePath Condition="'$(PySourcePath)' == ''">$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)\..\))</PySourcePath>
-    <PySourcePath Condition="!HasTrailingSlash($(PySourcePath))">$(PySourcePath)\</PySourcePath>
+    <PySourcePath Condition="!HasTrailingSlash($(PySourcePath))">$(PySourcePath)\</PySourcePath>    <!-- Directory where build outputs are put -->
 
     <!-- Directory where build outputs are put -->
-    <BuildPath32 Condition="'$(Py_OutDir)' == ''">$(PySourcePath)PCbuild\win32\</BuildPath32>
+    <BuildPath32 Condition="'$(Py_OutDir)' == ''">$(PySourcePath)SingleBinaryBuild\win32\</BuildPath32>
     <BuildPath32 Condition="'$(Py_OutDir)' != ''">$(Py_OutDir)\win32\</BuildPath32>
-    <BuildPath64 Condition="'$(Py_OutDir)' == ''">$(PySourcePath)PCbuild\amd64\</BuildPath64>
+    <BuildPath64 Condition="'$(Py_OutDir)' == ''">$(PySourcePath)SingleBinaryBuild\amd64\</BuildPath64>
     <BuildPath64 Condition="'$(Py_OutDir)' != ''">$(Py_OutDir)\amd64\</BuildPath64>
-    <BuildPathArm32 Condition="'$(Py_OutDir)' == ''">$(PySourcePath)PCbuild\arm32\</BuildPathArm32>
+    <BuildPathArm32 Condition="'$(Py_OutDir)' == ''">$(PySourcePath)SingleBinaryBuild\arm32\</BuildPathArm32>
     <BuildPathArm32 Condition="'$(Py_OutDir)' != ''">$(Py_OutDir)\arm32\</BuildPathArm32>
-    <BuildPathArm64 Condition="'$(Py_OutDir)' == ''">$(PySourcePath)PCbuild\arm64\</BuildPathArm64>
+    <BuildPathArm64 Condition="'$(Py_OutDir)' == ''">$(PySourcePath)SingleBinaryBuild\arm64\</BuildPathArm64>
     <BuildPathArm64 Condition="'$(Py_OutDir)' != ''">$(Py_OutDir)\arm64\</BuildPathArm64>
     <BuildPath Condition="'$(ArchName)' == 'win32'">$(BuildPath32)</BuildPath>
     <BuildPath Condition="'$(ArchName)' == 'amd64'">$(BuildPath64)</BuildPath>
     <BuildPath Condition="'$(ArchName)' == 'arm32'">$(BuildPathArm32)</BuildPath>
     <BuildPath Condition="'$(ArchName)' == 'arm64'">$(BuildPathArm64)</BuildPath>
-    <BuildPath Condition="'$(BuildPath)' == ''">$(PySourcePath)PCbuild\$(ArchName)\</BuildPath>
+    <BuildPath Condition="'$(BuildPath)' == ''">$(PySourcePath)SingleBinaryBuild\$(ArchName)\</BuildPath>
     <BuildPath Condition="!HasTrailingSlash($(BuildPath))">$(BuildPath)\</BuildPath>
     <BuildPath Condition="$(Configuration) == 'PGInstrument'">$(BuildPath)instrumented\</BuildPath>
 
@@ -180,11 +180,11 @@
     Override the version number when building by specifying OverrideVersion.
     For example:
 
-        PCbuild\build.bat "/p:OverrideVersion=3.5.2a1"
+        SingleBinaryBuild\build.bat "/p:OverrideVersion=3.5.2a1"
 
     Use the -V option to check your version is valid:
 
-        PCbuild\build.bat -V "/p:OverrideVersion=3.5.2a1"
+        SingleBinaryBuild\build.bat -V "/p:OverrideVersion=3.5.2a1"
           PythonVersionNumber: 3.5.2
           PythonVersion:       3.5.2a1
           PythonVersionHex:    0x030502A1

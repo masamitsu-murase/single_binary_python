@@ -11,7 +11,7 @@
 
 # THEORETICALLY, you can:
 # * Unpack the latest OpenSSL release where $(opensslDir) in
-#   PCbuild\pyproject.props expects it to be.
+#   SingleBinaryBuild\pyproject.props expects it to be.
 # * Install ActivePerl and ensure it is somewhere on your path.
 # * Run this script with the OpenSSL source dir as the only argument.
 #

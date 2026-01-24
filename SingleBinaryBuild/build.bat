@@ -10,7 +10,7 @@ echo.After the flags recognized by this script, up to 9 arguments to be passed
 echo.directly to MSBuild may be passed.  If the argument contains an '=', the
 echo.entire argument must be quoted (e.g. `%~nx0 "/p:PlatformToolset=v141"`).
 echo.Alternatively you can put extra flags for MSBuild in a file named 
-echo.`msbuild.rsp` in the `PCbuild` directory, one flag per line. This file
+echo.`msbuild.rsp` in the `SingleBinaryBuild` directory, one flag per line. This file
 echo.will be picked automatically by MSBuild. Flags put in this file do not
 echo.need to be quoted. You can still use environment variables inside the 
 echo.response file.

@@ -219,7 +219,7 @@ _ssl
         https://www.openssl.org/
 
     Building OpenSSL requires Perl on your path, and can be performed by
-    running PCbuild\prepare_ssl.bat. This will retrieve the version of
+    running SingleBinaryBuild\prepare_ssl.bat. This will retrieve the version of
     the sources matched to the current commit from the OpenSSL branch
     in our source repository at
     https://github.com/python/cpython-source-deps.
@@ -236,13 +236,11 @@ _sqlite3
 _tkinter
     Wraps version 8.6.15 of the Tk windowing system, which is downloaded
     from our binaries repository at
-    https://github.com/python/cpython-bin-deps.
-
-    Homepage:
+    https://github.com/python/cpython-bin-deps.    Homepage:
         https://www.tcl.tk/
 
     Building Tcl and Tk can be performed by running
-    PCbuild\prepare_tcltk.bat. This will retrieve the version of the
+    SingleBinaryBuild\prepare_tcltk.bat. This will retrieve the version of the
     sources matched to the current commit from the Tcl and Tk branches
     in our source repository at
     https://github.com/python/cpython-source-deps.
@@ -291,7 +289,7 @@ virtual environment will be used. If none is active, and HOST_PYTHON is
 set to a recent enough version or "py.exe" is able to find a recent
 enough version, those will be used. If all else fails, a copy of Python
 will be downloaded from NuGet and extracted to the externals directory.
-This will then be used for later builds (see PCbuild/find_python.bat
+This will then be used for later builds (see SingleBinaryBuild/find_python.bat
 for the full logic).
 
 It is also possible to download sources from each project's homepage,
@@ -337,7 +335,7 @@ You can set optimization flags either via
 
     build.bat "/p:WITH_COMPUTED_GOTOS=true"
 
-* or put them in `msbuild.rsp` in the `PCbuild` directory, one flag per line.
+* or put them in `msbuild.rsp` in the `SingleBinaryBuild` directory, one flag per line.
 
 Supported flags are:
 
@@ -359,7 +357,7 @@ also have to change the "Runtime Library" from "Multi-threaded DLL
 Visual Studio properties
 ------------------------
 
-The PCbuild solution makes use of Visual Studio property files (*.props)
+The SingleBinaryBuild solution makes use of Visual Studio property files (*.props)
 to simplify each project. The properties can be viewed in the Property
 Manager (View -> Other Windows -> Property Manager) but should be
 carefully modified by hand.
@@ -382,24 +380,24 @@ Add a new project
 For example, add a new _testclinic_limited project to build a new
 _testclinic_limited extension, the file Modules/_testclinic_limited.c:
 
-* In PCbuild/, copy _testclinic.vcxproj to _testclinic_limited.vcxproj,
+* In SingleBinaryBuild/, copy _testclinic.vcxproj to _testclinic_limited.vcxproj,
   replace RootNamespace value with `_testclinic_limited`, replace
   `_asyncio.c` with `_testclinic_limited.c`.
-* In PCbuild/, copy _testclinic.vcxproj.filters to
+* In SingleBinaryBuild/, copy _testclinic.vcxproj.filters to
   _testclinic_limited.vcxproj.filters, edit the list of files in the new file.
-* Open Visual Studio, open PCbuild\pcbuild.sln solution, add the
-  PCbuild\_testclinic_limited.vcxproj project to the solution ("add existing
+* Open Visual Studio, open SingleBinaryBuild\pcbuild.sln solution, add the
+  SingleBinaryBuild\_testclinic_limited.vcxproj project to the solution ("add existing
   project).
 * Add a dependency on the python project to the new _testclinic_limited
   project.
 * Save and exit Visual Studio.
 * Add `;_testclinic_limited` to `<TestModules Include="...">` in
-  PCbuild\pcbuild.proj.
+  SingleBinaryBuild\pcbuild.proj.
 * Update "exts" in Tools\msi\lib\lib_files.wxs file or in
   Tools\msi\test\test_files.wxs file (for tests).
 * PC\layout\main.py needs updating if you add a test-only extension whose name
   doesn't start with "_test".
-* Add the extension to PCbuild\readme.txt (this file).
+* Add the extension to SingleBinaryBuild\readme.txt (this file).
 * Build Python from scratch (clean the solution) to check that the new project
   is built successfully.
 * Ensure the new .vcxproj and .vcxproj.filters files are added to your commit,
