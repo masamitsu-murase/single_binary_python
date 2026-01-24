@@ -91,7 +91,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>Py_BUILD_CORE;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Py_BUILD_CORE;Py_BUILD_CORE_BUILTIN;Py_SINGLE_BINARY_BUILD;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -100,6 +100,7 @@
       <StackReserveSize Condition="$(Configuration) == 'PGInstrument'">12000000</StackReserveSize>
       <!-- HACK: Need additional memory to avoid crashing until gh-113655 is fixed -->
       <StackReserveSize Condition="$(Configuration) == 'PGUpdate' and $(UseExtraStackReserve) == 'true'">3000000</StackReserveSize>
+      <AdditionalDependencies>pythoncore_static$(PyDebugExt).lib;python3_static$(PyDebugExt).lib;version.lib;ws2_32.lib;pathcch.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -114,6 +115,10 @@
   <ItemGroup>
     <ProjectReference Include="pythoncore.vcxproj">
       <Project>{cf7ac3d1-e2df-41d2-bea6-1e2556cdea26}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="python3dll.vcxproj">
+      <Project>{885d4898-d08d-4091-9c40-c700cfe3fc5a}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
