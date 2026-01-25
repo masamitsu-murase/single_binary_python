@@ -4,12 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches:
-    - 'main'
+    - 'single_binary_python'
     - 'sample'
-  pull_request:
-    branches:
-    - 'main'
-    - '3.*'
 
 permissions:
   contents: read
