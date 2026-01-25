@@ -25,7 +25,7 @@
 #endif
 
 #if defined(_WIN32) || defined(__CYGWIN__)
-    #if defined(Py_ENABLE_SHARED)
+    #if defined(Py_ENABLE_SHARED) || defined(Py_SINGLE_BINARY_BUILD)
         #define Py_IMPORTED_SYMBOL __declspec(dllimport)
         #define Py_EXPORTED_SYMBOL __declspec(dllexport)
         #define Py_LOCAL_SYMBOL
@@ -54,7 +54,7 @@
 #endif
 
 /* only get special linkage if built as shared or platform is Cygwin */
-#if defined(Py_ENABLE_SHARED) || defined(__CYGWIN__)
+#if defined(Py_ENABLE_SHARED) || defined(__CYGWIN__) || defined(Py_SINGLE_BINARY_BUILD)
 #       if defined(HAVE_DECLSPEC_DLL)
 #               if defined(Py_BUILD_CORE) && !defined(Py_BUILD_CORE_MODULE)
 #                       define PyAPI_FUNC(RTYPE) Py_EXPORTED_SYMBOL RTYPE

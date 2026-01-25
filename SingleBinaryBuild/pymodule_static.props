@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- 
+    Static library build configuration for Python extension modules
+    Import this after pyproject.props in extension module vcxproj files
+  -->
+  <PropertyGroup Label="Configuration">
+    <!-- Override DynamicLibrary to StaticLibrary -->
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Remove .pyd extension, use standard .lib naming -->
+    <TargetExt>.lib</TargetExt>
+    <TargetName>$(ProjectName)_builtin</TargetName>
+  </PropertyGroup>
+
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <!-- Mark as built-in module -->
+      <PreprocessorDefinitions>Py_BUILD_CORE_BUILTIN;Py_SINGLE_BINARY_BUILD;Py_NO_ENABLE_SHARED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>

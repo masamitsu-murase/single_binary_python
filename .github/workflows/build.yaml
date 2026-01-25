@@ -1,0 +1,28 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - 'single_binary_python'
+    - 'sample'
+
+permissions:
+  contents: read
+
+env:
+  FORCE_COLOR: 1
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        persist-credentials: false
+    - name: Build CPython
+      run: SingleBinaryBuild.bat
+      shell: bash
+    - name: Display build info
+      run: .\\python.bat -m test.pythoninfo
+    

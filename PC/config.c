@@ -88,6 +88,24 @@ extern PyObject* PyInit__suggestions(void);
 /* tools/freeze/makeconfig.py marker for additional "extern" */
 /* -- ADDMODULE MARKER 1 -- */
 
+/* Built-in extension modules for static linking */
+PyMODINIT_FUNC PyInit__asyncio(void);
+PyMODINIT_FUNC PyInit__decimal(void);
+PyMODINIT_FUNC PyInit__elementtree(void);
+PyMODINIT_FUNC PyInit__multiprocessing(void);
+PyMODINIT_FUNC PyInit__overlapped(void);
+PyMODINIT_FUNC PyInit__queue(void);
+PyMODINIT_FUNC PyInit__remote_debugging(void);
+PyMODINIT_FUNC PyInit__socket(void);
+PyMODINIT_FUNC PyInit__uuid(void);
+PyMODINIT_FUNC PyInit__wmi(void);
+PyMODINIT_FUNC PyInit__zoneinfo(void);
+PyMODINIT_FUNC PyInit_pyexpat(void);
+PyMODINIT_FUNC PyInit_select(void);
+PyMODINIT_FUNC PyInit_unicodedata(void);
+PyMODINIT_FUNC PyInit_winsound(void);
+PyMODINIT_FUNC PyInit__ctypes(void);
+
 extern PyObject* PyMarshal_Init(void);
 extern PyObject* PyInit__imp(void);
 
@@ -171,6 +189,24 @@ struct _inittab _PyImport_Inittab[] = {
 
 /* tools/freeze/makeconfig.py marker for additional "_inittab" entries */
 /* -- ADDMODULE MARKER 2 -- */
+
+    /* Built-in extension modules (statically linked) */
+    {"_asyncio", PyInit__asyncio},
+    {"_decimal", PyInit__decimal},
+    {"_elementtree", PyInit__elementtree},
+    {"_multiprocessing", PyInit__multiprocessing},
+    {"_overlapped", PyInit__overlapped},
+    {"_queue", PyInit__queue},
+    {"_remote_debugging", PyInit__remote_debugging},
+    {"_socket", PyInit__socket},
+    {"_uuid", PyInit__uuid},
+    {"_wmi", PyInit__wmi},
+    {"_zoneinfo", PyInit__zoneinfo},
+    {"pyexpat", PyInit_pyexpat},
+    {"select", PyInit_select},
+    {"unicodedata", PyInit_unicodedata},
+    {"winsound", PyInit_winsound},
+    {"_ctypes", PyInit__ctypes},
 
     /* This module "lives in" with marshal.c */
     {"marshal", PyMarshal_Init},
