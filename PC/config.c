@@ -104,6 +104,7 @@ PyMODINIT_FUNC PyInit_pyexpat(void);
 PyMODINIT_FUNC PyInit_select(void);
 PyMODINIT_FUNC PyInit_unicodedata(void);
 PyMODINIT_FUNC PyInit_winsound(void);
+PyMODINIT_FUNC PyInit__ctypes(void);
 
 extern PyObject* PyMarshal_Init(void);
 extern PyObject* PyInit__imp(void);
@@ -205,6 +206,7 @@ struct _inittab _PyImport_Inittab[] = {
     {"select", PyInit_select},
     {"unicodedata", PyInit_unicodedata},
     {"winsound", PyInit_winsound},
+    {"_ctypes", PyInit__ctypes},
 
     /* This module "lives in" with marshal.c */
     {"marshal", PyMarshal_Init},
