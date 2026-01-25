@@ -6,7 +6,7 @@
   -->
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalDependencies>pythoncore_static$(PyDebugExt).lib;python314$(PyDebugExt).lib;_asyncio_builtin$(PyDebugExt).lib;_ctypes_builtin$(PyDebugExt).lib;_decimal_builtin$(PyDebugExt).lib;_elementtree_builtin$(PyDebugExt).lib;_multiprocessing_builtin$(PyDebugExt).lib;_overlapped_builtin$(PyDebugExt).lib;_queue_builtin$(PyDebugExt).lib;_remote_debugging_builtin$(PyDebugExt).lib;_socket_builtin$(PyDebugExt).lib;_uuid_builtin$(PyDebugExt).lib;_wmi_builtin$(PyDebugExt).lib;_zoneinfo_builtin$(PyDebugExt).lib;pyexpat_builtin$(PyDebugExt).lib;select_builtin$(PyDebugExt).lib;unicodedata_builtin$(PyDebugExt).lib;winsound_builtin$(PyDebugExt).lib;$(libffiOutDir)\libffi-8.lib;version.lib;ws2_32.lib;pathcch.lib;bcrypt.lib;iphlpapi.lib;rpcrt4.lib;ole32.lib;oleaut32.lib;propsys.lib;wbemuuid.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>pythoncore_static$(PyDebugExt).lib;python314$(PyDebugExt).lib;_asyncio_builtin$(PyDebugExt).lib;_bz2_builtin$(PyDebugExt).lib;_ctypes_builtin$(PyDebugExt).lib;_decimal_builtin$(PyDebugExt).lib;_elementtree_builtin$(PyDebugExt).lib;_hashlib_builtin$(PyDebugExt).lib;_lzma_builtin$(PyDebugExt).lib;_multiprocessing_builtin$(PyDebugExt).lib;_overlapped_builtin$(PyDebugExt).lib;_queue_builtin$(PyDebugExt).lib;_remote_debugging_builtin$(PyDebugExt).lib;_socket_builtin$(PyDebugExt).lib;_sqlite3_builtin$(PyDebugExt).lib;_uuid_builtin$(PyDebugExt).lib;_wmi_builtin$(PyDebugExt).lib;_zoneinfo_builtin$(PyDebugExt).lib;_zstd_builtin$(PyDebugExt).lib;pyexpat_builtin$(PyDebugExt).lib;select_builtin$(PyDebugExt).lib;unicodedata_builtin$(PyDebugExt).lib;winsound_builtin$(PyDebugExt).lib;$(libffiOutDir)\libffi-8.lib;version.lib;ws2_32.lib;pathcch.lib;bcrypt.lib;iphlpapi.lib;rpcrt4.lib;ole32.lib;oleaut32.lib;propsys.lib;wbemuuid.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalDependencies Condition="$(IncludeExternals)">zlib-ng$(PyDebugExt).lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -14,6 +14,10 @@
     <!-- Static builtin extension modules -->
     <ProjectReference Include="$(MSBuildThisFileDirectory)_asyncio.vcxproj">
       <Project>{384C224A-7474-476E-A01B-750EA7DE918C}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)_bz2.vcxproj">
+      <Project>{73FCD2BD-F133-46B7-8EC1-144CD82A59D5}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="$(MSBuildThisFileDirectory)_ctypes.vcxproj">
@@ -26,6 +30,14 @@
     </ProjectReference>
     <ProjectReference Include="$(MSBuildThisFileDirectory)_elementtree.vcxproj">
       <Project>{17E1E049-C309-4D79-843F-AE483C264AEA}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)_hashlib.vcxproj">
+      <Project>{447F05A8-F581-4CAC-A466-5AC7936E207E}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)_lzma.vcxproj">
+      <Project>{F9D71780-F393-11E0-BE50-0800200C9A66}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="$(MSBuildThisFileDirectory)_multiprocessing.vcxproj">
@@ -48,6 +60,10 @@
       <Project>{86937F53-C189-40EF-8CE8-8759D8E7D480}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)_sqlite3.vcxproj">
+      <Project>{13CECB97-4119-4316-9D42-8534019A5A44}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="$(MSBuildThisFileDirectory)_uuid.vcxproj">
       <Project>{CB435430-EBB1-478B-8F4E-C256F6838F55}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -58,6 +74,10 @@
     </ProjectReference>
     <ProjectReference Include="$(MSBuildThisFileDirectory)_zoneinfo.vcxproj">
       <Project>{FCBE1EF2-E0F0-40B1-88B5-00A35D378742}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)_zstd.vcxproj">
+      <Project>{07029b86-f3e9-443e-86fb-78aa6d47fed1}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="$(MSBuildThisFileDirectory)pyexpat.vcxproj">
