@@ -102,48 +102,6 @@ load_helper_module(void)
     return module;
 }
 
-static int
-uncompress_data(const unsigned char *compressed, size_t compressed_size,
-                unsigned char **output, size_t output_size)
-{
-    z_stream stream;
-    int err;
-
-    *output = (unsigned char *)PyMem_Malloc(output_size);
-    if (*output == NULL) {
-        PyErr_NoMemory();
-        return -1;
-    }
-
-    stream.zalloc = (alloc_func)NULL;
-    stream.zfree = (free_func)NULL;
-    stream.opaque = (voidpf)NULL;
-    stream.next_in = (Bytef *)compressed;
-    stream.avail_in = (uInt)compressed_size;
-    stream.next_out = *output;
-    stream.avail_out = (uInt)output_size;
-
-    err = inflateInit(&stream);
-    if (err != Z_OK) {
-        PyMem_Free(*output);
-        *output = NULL;
-        PyErr_SetString(EmbeddedImportError, "zlib inflateInit failed");
-        return -1;
-    }
-
-    err = inflate(&stream, Z_FINISH);
-    if (err != Z_STREAM_END) {
-        inflateEnd(&stream);
-        PyMem_Free(*output);
-        *output = NULL;
-        PyErr_SetString(EmbeddedImportError, "zlib inflate failed");
-        return -1;
-    }
-
-    inflateEnd(&stream);
-    return 0;
-}
-
 static size_t
 count_filenames(const char *p)
 {
@@ -165,10 +123,20 @@ ensure_embedded_data(void)
         return 0;
     }
 
-    if (uncompress_data(embeddedimporter_raw_data_compressed,
-                        embeddedimporter_raw_data_compressed_size,
-                        &embedded_raw_data,
-                        embeddedimporter_raw_data_size) < 0) {
+    embedded_raw_data = (unsigned char *)PyMem_Malloc(embeddedimporter_raw_data_size);
+    if (embedded_raw_data == NULL) {
+        PyErr_NoMemory();
+        return -1;
+    }
+
+    uLongf out_len = (uLongf)embeddedimporter_raw_data_size;
+    int zerr = uncompress((Bytef *)embedded_raw_data, &out_len,
+                          (const Bytef *)embeddedimporter_raw_data_compressed,
+                          (uLong)embeddedimporter_raw_data_compressed_size);
+    if (zerr != Z_OK || out_len != (uLongf)embeddedimporter_raw_data_size) {
+        PyMem_Free(embedded_raw_data);
+        embedded_raw_data = NULL;
+        PyErr_SetString(EmbeddedImportError, "zlib uncompress failed");
         return -1;
     }
 
