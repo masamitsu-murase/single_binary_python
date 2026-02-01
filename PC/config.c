@@ -84,6 +84,7 @@ extern PyObject* PyInit__opcode(void);
 extern PyObject* PyInit__contextvars(void);
 extern PyObject* PyInit__tokenize(void);
 extern PyObject* PyInit__suggestions(void);
+extern PyObject* PyInit_embeddedimport(void);
 
 /* tools/freeze/makeconfig.py marker for additional "extern" */
 /* -- ADDMODULE MARKER 1 -- */
@@ -131,6 +132,7 @@ struct _inittab _PyImport_Inittab[] = {
     {"time", PyInit_time},
     {"_thread", PyInit__thread},
     {"_tokenize", PyInit__tokenize},
+    {"embeddedimport", PyInit_embeddedimport},
     {"_types", PyInit__types},
     {"_typing", PyInit__typing},
     {"_statistics", PyInit__statistics},

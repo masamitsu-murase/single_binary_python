@@ -449,6 +449,8 @@
     </ClCompile>
     <ClCompile Include="..\Modules\_heapqmodule.c" />
     <ClCompile Include="..\Modules\_json.c" />
+    <ClCompile Include="..\Modules\embeddedimport.c" />
+    <ClCompile Include="..\Modules\embeddedimport_data.c" />
     <ClCompile Include="..\Modules\_localemodule.c" />
     <ClCompile Include="..\Modules\_lsprof.c" />
     <ClCompile Include="..\Modules\_pickle.c" />
