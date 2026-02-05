@@ -31,9 +31,7 @@ jobs:
       shell: cmd
       run: |
         echo Setting up libffi environment
-        set SH=C:\cygwin\bin\sh.exe
-        echo SH=%SH%
-        echo SH=%SH%>> %GITHUB_ENV%
+        echo SH=C:\cygwin\bin\sh.exe>> %GITHUB_ENV%
     
     - name: Build CPython
       run: cmd /c SingleBinaryBuild.bat
