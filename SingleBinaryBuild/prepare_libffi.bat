@@ -167,7 +167,7 @@ if exist %_LIBFFI_OUT% (rd %_LIBFFI_OUT% /s/q)
 echo ================================================================
 echo Configure the build to generate fficonfig.h and ffi.h
 echo ================================================================
-%SH% -lc "(cd $OLDPWD; ./configure CC='%MSVCC% %ASSEMBLER% %BUILD_PDB%' CXX='%MSVCC% %ASSEMBLER% %BUILD_PDB%' LD='link' CPP='cl -nologo -EP' CXXCPP='cl -nologo -EP' CPPFLAGS='-DFFI_BUILDING_DLL' %BUILD_NOOPT% NM='dumpbin -symbols' STRIP=':' --build=$BUILD --host=$HOST;)"
+%SH% -lc "(cd $OLDPWD; ./configure CC='%MSVCC% -DUSE_STATIC_RTL %ASSEMBLER% %BUILD_PDB%' CXX='%MSVCC% -DUSE_STATIC_RTL %ASSEMBLER% %BUILD_PDB%' LD='link' CPP='cl -nologo -EP' CXXCPP='cl -nologo -EP' CPPFLAGS='-DFFI_BUILDING_DLL' %BUILD_NOOPT% NM='dumpbin -symbols' STRIP=':' --build=$BUILD --host=$HOST;)"
 if errorlevel 1 exit /B %ERRORLEVEL%
 
 echo ================================================================
@@ -189,6 +189,7 @@ echo copying files to %_LIBFFI_OUT%
 if not exist %_LIBFFI_OUT%\include (md %_LIBFFI_OUT%\include)
 copy %ARTIFACTS%\.libs\libffi-*.dll %_LIBFFI_OUT% || exit /B 1
 copy %ARTIFACTS%\.libs\libffi-*.lib %_LIBFFI_OUT% || exit /B 1
+copy %ARTIFACTS%\.libs\libffi_convenience.lib %_LIBFFI_OUT% || exit /B 1
 copy %ARTIFACTS%\.libs\libffi-*.pdb %_LIBFFI_OUT%
 copy %ARTIFACTS%\fficonfig.h %_LIBFFI_OUT%\include || exit /B 1
 copy %ARTIFACTS%\include\*.h %_LIBFFI_OUT%\include || exit /B 1
