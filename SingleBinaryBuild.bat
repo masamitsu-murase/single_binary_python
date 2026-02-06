@@ -6,4 +6,4 @@ set "VCVARSALL=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxil
 call SingleBinaryBuild\prepare_libffi.bat -x64 --install-cygwin
 call SingleBinaryBuild\prepare_ssl.bat
 call SingleBinaryBuild\prepare_tcltk.bat
-call SingleBinaryBuild\build.bat -c Release -p x64 -t Build
+call SingleBinaryBuild\build.bat -c Release -p x64 -t Build --no-tkinter
