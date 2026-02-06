@@ -3,7 +3,7 @@
 #include "Python.h"
 
 #include <stdint.h>
-#include <zlib.h>
+#include <zstd.h>
 
 #ifdef MS_WINDOWS
 #include <windows.h>
@@ -129,14 +129,14 @@ ensure_embedded_data(void)
         return -1;
     }
 
-    uLongf out_len = (uLongf)embeddedimporter_raw_data_size;
-    int zerr = uncompress((Bytef *)embedded_raw_data, &out_len,
-                          (const Bytef *)embeddedimporter_raw_data_compressed,
-                          (uLong)embeddedimporter_raw_data_compressed_size);
-    if (zerr != Z_OK || out_len != (uLongf)embeddedimporter_raw_data_size) {
+    size_t result_len = ZSTD_decompress(embedded_raw_data,
+                                        embeddedimporter_raw_data_size,
+                                        embeddedimporter_raw_data_compressed,
+                                        embeddedimporter_raw_data_compressed_size);
+    if (ZSTD_isError(result_len) || result_len != embeddedimporter_raw_data_size) {
         PyMem_Free(embedded_raw_data);
         embedded_raw_data = NULL;
-        PyErr_SetString(EmbeddedImportError, "zlib uncompress failed");
+        PyErr_SetString(EmbeddedImportError, "zstd decompress failed");
         return -1;
     }
 

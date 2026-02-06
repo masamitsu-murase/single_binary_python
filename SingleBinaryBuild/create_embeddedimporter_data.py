@@ -3,7 +3,7 @@ import glob
 import os
 import os.path
 import tokenize
-import zlib
+import compression.zstd as zstd
 
 
 def check_skip(filename):
@@ -81,7 +81,8 @@ def output_list(file_list):
         file.write("const size_t embeddedimporter_raw_data_size = %d;\n" % len(all_data))
         file.write("\n")
 
-        compressed = zlib.compress(all_data, 9)
+        level = zstd.CompressionParameter.compression_level.bounds()[1]
+        compressed = zstd.compress(all_data, level)
         file.write("const unsigned char embeddedimporter_raw_data_compressed[] = {\n")
         for slice_data in (compressed[i:(i + 16)] for i in range(0, len(compressed), 16)):
             file.write("  " + ",".join(("0x%02x" % ch) for ch in slice_data) + ",\n")
