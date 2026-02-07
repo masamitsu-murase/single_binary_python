@@ -46,11 +46,11 @@ rem if ERRORLEVEL 1 (echo Cannot locate python.exe on PATH or as PYTHON variable
 
 call "%PCBUILD%\get_externals.bat" --tkinter-src %ORG_SETTING%
 
-%MSBUILD% "%PCBUILD%\tcl.vcxproj" /p:Configuration=Release /p:Platform=Win32
-%MSBUILD% "%PCBUILD%\tk.vcxproj" /p:Configuration=Release /p:Platform=Win32
+REM %MSBUILD% "%PCBUILD%\tcl.vcxproj" /p:Configuration=Release /p:Platform=Win32
+REM %MSBUILD% "%PCBUILD%\tk.vcxproj" /p:Configuration=Release /p:Platform=Win32
 
 %MSBUILD% "%PCBUILD%\tcl.vcxproj" /p:Configuration=Release /p:Platform=x64
 %MSBUILD% "%PCBUILD%\tk.vcxproj" /p:Configuration=Release /p:Platform=x64
 
-%MSBUILD% "%PCBUILD%\tcl.vcxproj" /p:Configuration=Release /p:Platform=ARM64
-%MSBUILD% "%PCBUILD%\tk.vcxproj" /p:Configuration=Release /p:Platform=ARM64
+REM EM %MSBUILD% "%PCBUILD%\tcl.vcxproj" /p:Configuration=Release /p:Platform=ARM64
+REM EM %MSBUILD% "%PCBUILD%\tk.vcxproj" /p:Configuration=Release /p:Platform=ARM64
