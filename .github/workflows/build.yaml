@@ -21,7 +21,7 @@ jobs:
       with:
         persist-credentials: false
     - name: Get externals
-      run: cmd /c SingleBinaryBuild\get_externals.bat --tkinter-src --openssl-src --libffi-src --no-llvm --no-openssl
+      run: cmd /c SingleBinaryBuild\get_externals.bat --tkinter-src --openssl-src --libffi-src
     - name: Build libffi
       run: |
         set LIBFFI_SOURCE=%CD%\externals\libffi-3.4.4

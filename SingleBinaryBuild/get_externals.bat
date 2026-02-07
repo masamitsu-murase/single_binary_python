@@ -12,10 +12,10 @@ set IncludeTkinterSrc=false
 set IncludeSSLSrc=false
 
 :CheckOpts
-if "%~1"=="--no-tkinter" (set IncludeTkinter=false) & shift & goto CheckOpts
-if "%~1"=="--no-openssl" (set IncludeSSL=false) & shift & goto CheckOpts
-if "%~1"=="--no-libffi" (set IncludeLibffi=false) & shift & goto CheckOpts
-if "%~1"=="--no-llvm" (set IncludeLLVM=false) & shift & goto CheckOpts
+if "%~1"=="--add-tkinter" (set IncludeTkinter=true) & shift & goto CheckOpts
+if "%~1"=="--add-openssl" (set IncludeSSL=true) & shift & goto CheckOpts
+if "%~1"=="--add-libffi" (set IncludeLibffi=true) & shift & goto CheckOpts
+if "%~1"=="--add-llvm" (set IncludeLLVM=true) & shift & goto CheckOpts
 if "%~1"=="--tkinter-src" (set IncludeTkinterSrc=true) & shift & goto CheckOpts
 if "%~1"=="--openssl-src" (set IncludeSSLSrc=true) & shift & goto CheckOpts
 if "%~1"=="--libffi-src" (set IncludeLibffiSrc=true) & shift & goto CheckOpts
@@ -78,11 +78,11 @@ for %%e in (%libraries%) do (
 echo.Fetching external binaries...
 
 set binaries=
-if NOT "%IncludeLibffi%"=="false"  set binaries=%binaries% libffi-3.4.4
-if NOT "%IncludeSSL%"=="false"     set binaries=%binaries% openssl-bin-3.0.18
-if NOT "%IncludeTkinter%"=="false" set binaries=%binaries% tcltk-8.6.15.0
+if "%IncludeLibffi%"=="true"  set binaries=%binaries% libffi-3.4.4
+if "%IncludeSSL%"=="true"     set binaries=%binaries% openssl-bin-3.0.18
+if "%IncludeTkinter%"=="true" set binaries=%binaries% tcltk-8.6.15.0
 if NOT "%IncludeSSLSrc%"=="false"  set binaries=%binaries% nasm-2.11.06
-if NOT "%IncludeLLVM%"=="false"    set binaries=%binaries% llvm-19.1.7.0
+if "%IncludeLLVM%"=="true"    set binaries=%binaries% llvm-19.1.7.0
 
 for %%b in (%binaries%) do (
     if exist "%EXTERNALS_DIR%\%%b" (
