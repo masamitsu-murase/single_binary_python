@@ -20,6 +20,18 @@ jobs:
     - uses: actions/checkout@v4
       with:
         persist-credentials: false
+    - name: Get externals
+      run: cmd /c SingleBinaryBuild\get_externals.bat --tkinter-src --openssl-src --libffi-src --no-llvm --no-openssl
+    - name: Build libffi
+      run: |
+        set LIBFFI_SOURCE=%CD%\externals\libffi-3.4.4
+        set "VCVARSALL=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
+        call SingleBinaryBuild\prepare_libffi.bat -x64 --install-cygwin
+      shell: cmd
+    - name: Build openssl
+      run: cmd /c SingleBinaryBuild\prepare_ssl.bat
+    - name: Build tcl/tk
+      run: cmd /c SingleBinaryBuild\prepare_tcltk.bat
     - name: Build CPython
       run: cmd /c SingleBinaryBuild.bat
     - name: Display build info
