@@ -26,7 +26,7 @@
           Outputs="@(_SSLDLL->'$(OutDir)%(Filename)%(Extension)')"
           Condition="$(SkipCopySSLDLL) == ''"
           AfterTargets="Build">
-    <Copy SourceFiles="@(_SSLDLL)" DestinationFolder="$(OutDir)" />
+    <!-- Copy SourceFiles="@(_SSLDLL)" DestinationFolder="$(OutDir)" /-->
   </Target>
   <Target Name="_CleanSSLDLL" Condition="$(SkipCopySSLDLL) == ''" BeforeTargets="Clean">
     <Delete Files="@(_SSLDLL->'$(OutDir)%(Filename)%(Extension)')" TreatErrorsAsWarnings="true" />
