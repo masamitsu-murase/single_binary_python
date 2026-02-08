@@ -43,9 +43,13 @@ jobs:
         md artifact
         copy SingleBinaryBuild\amd64\python.exe artifact\sbpython.exe
         copy SingleBinaryBuild\amd64\pythonw.exe artifact\sbpythonw.exe
+      shell: cmd
     - uses: actions/upload-artifact@v4
       with:
         name: python
         path: artifact/*.exe
     - name: Test
-      run: -m test.regrtest -x test_concurrent_futures test_ctypes test_distutils test_ensurepip test_idle test_importlib test_lib2to3 test_pydoc test_ttk_textonly test_unittest test_readline test_threaded_import test_venv
+      run: |
+        copy SingleBinaryBuild\amd64\python.exe .
+        .\sbpython.exe -m test.regrtest -x test_concurrent_futures test_ctypes test_distutils test_ensurepip test_idle test_importlib test_lib2to3 test_pydoc test_ttk_textonly test_unittest test_readline test_threaded_import test_venv
+      shell: cmd
