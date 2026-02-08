@@ -36,4 +36,12 @@ jobs:
       run: cmd /c SingleBinaryBuild.bat
     - name: Display build info
       run: .\\python.bat -m test.pythoninfo
-    
+    - name: Prepare artifact
+      run: |
+        md artifact
+        copy SingleBinaryBuild\amd64\python.exe artifact\sbpython.exe
+        copy SingleBinaryBuild\amd64\pythonw.exe artifact\sbpythonw.exe
+    - uses: actions/upload-artifact@v4
+      with:
+        name: python
+        path: artifact/*.exe
