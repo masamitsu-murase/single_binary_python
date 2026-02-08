@@ -426,8 +426,10 @@ static struct PyModuleDef embeddedimportmodule = {
 PyMODINIT_FUNC
 PyInit_embeddedimport(void)
 {
+PySys_WriteStderr("# Debug PyInit_embeddedimport: start\n");
     PyObject *m = PyModule_Create(&embeddedimportmodule);
     if (m == NULL) {
+PySys_WriteStderr("# Debug PyInit_embeddedimport: error: 2\n");
         return NULL;
     }
 
@@ -437,10 +439,12 @@ PyInit_embeddedimport(void)
         PyExc_ImportError,
         NULL);
     if (EmbeddedImportError == NULL) {
+PySys_WriteStderr("# Debug PyInit_embeddedimport: error: 3\n");
         Py_DECREF(m);
         return NULL;
     }
     if (PyModule_AddObject(m, "EmbeddedImportError", EmbeddedImportError) < 0) {
+PySys_WriteStderr("# Debug PyInit_embeddedimport: error: 4\n");
         Py_DECREF(EmbeddedImportError);
         Py_DECREF(m);
         return NULL;
@@ -449,6 +453,7 @@ PyInit_embeddedimport(void)
     /* Load Python helper module from embedded data and re-export class */
     PyObject *helper = load_helper_module();
     if (helper == NULL) {
+PySys_WriteStderr("# Debug PyInit_embeddedimport: error: 5\n");
         Py_DECREF(m);
         return NULL;
     }
@@ -456,15 +461,18 @@ PyInit_embeddedimport(void)
     PyObject *cls = PyObject_GetAttrString(helper, "EmbeddedImporter");
     Py_DECREF(helper);
     if (cls == NULL) {
+PySys_WriteStderr("# Debug PyInit_embeddedimport: error: 6\n");
         Py_DECREF(m);
         return NULL;
     }
 
     if (PyModule_AddObject(m, "embeddedimporter", cls) < 0) {
+PySys_WriteStderr("# Debug PyInit_embeddedimport: error: 7\n");
         Py_DECREF(cls);
         Py_DECREF(m);
         return NULL;
     }
+PySys_WriteStderr("# Debug PyInit_embeddedimport: success: 10\n");
 
     return m;
 }
