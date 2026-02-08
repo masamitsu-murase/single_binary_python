@@ -50,6 +50,6 @@ jobs:
         path: artifact/*.exe
     - name: Test
       run: |
-        copy SingleBinaryBuild\amd64\python.exe .
+        copy SingleBinaryBuild\amd64\python.exe .\sbpython.exe
         .\sbpython.exe -m test.regrtest -x test_concurrent_futures test_ctypes test_distutils test_ensurepip test_idle test_importlib test_lib2to3 test_pydoc test_ttk_textonly test_unittest test_readline test_threaded_import test_venv
       shell: cmd
