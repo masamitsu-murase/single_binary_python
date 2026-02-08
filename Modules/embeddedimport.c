@@ -38,6 +38,8 @@ static unsigned char *embedded_raw_data_resource = NULL;
 static size_t embedded_raw_data_resource_size = 0;
 static PyObject *embedded_index_resource = NULL;
 
+static PyObject *EmbeddedImportError = NULL;
+
 #ifdef Py_BUILD_RESOURCE_EMBEDDED_MODULE
 #error Not Implemented.
 static int ensure_resource_data(void);
@@ -313,19 +315,18 @@ static PyMethodDef embeddedimport_methods[] = {
     {NULL, NULL}
 };
 
-static PyModuleDef_Slot slots[] = {
+static PyModuleDef_Slot embeddedimport_slots[] = {
     {Py_mod_multiple_interpreters, Py_MOD_PER_INTERPRETER_GIL_SUPPORTED},
     {0, NULL}
 };
 
-embeddedimportmodule.m_slots = slots;
 static struct PyModuleDef embeddedimportmodule = {
     PyModuleDef_HEAD_INIT,
     "embeddedimport",
     "Embedded importer helper module.",
     -1,
     embeddedimport_methods,
-    slots,
+    embeddedimport_slots,
     NULL,
     NULL,
     NULL
