@@ -2,6 +2,8 @@
 import glob
 import os
 import os.path
+import string
+import subprocess
 import tokenize
 import compression.zstd as zstd
 
@@ -100,14 +102,64 @@ def output_list(file_list):
         file.write("};\n")
 
 
-pwd = os.getcwd()
-try:
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    os.chdir("..")
+def output_key_file_for_gperf(file_list):
+    acceptable_chars = string.ascii_letters + string.digits + "._/"
+    with open("Modules/embeddedimporter_gperf_keyfile.txt", "w") as file:
+        file.write("%{\n")
+        file.write("#include <stddef.h>\n")
 
-    os.chdir("Lib")
-    file_list = get_file_data()
-    os.chdir("..")
-    output_list(file_list)
-finally:
-    os.chdir(pwd)
+        all_data = b"".join(item["data"] for item in file_list)
+        file.write("const size_t embeddedimporter_raw_data_size = %d;\n" % len(all_data))
+
+        level = zstd.CompressionParameter.compression_level.bounds()[1]
+        compressed = zstd.compress(all_data, level)
+        file.write("const unsigned char embeddedimporter_raw_data_compressed[] = {\n")
+        for slice_data in (compressed[i:(i + 16)] for i in range(0, len(compressed), 16)):
+            file.write("  " + ",".join(("0x%02x" % ch) for ch in slice_data) + ",\n")
+        file.write("};\n")
+        file.write("\n")
+
+        file.write("const size_t embeddedimporter_raw_data_compressed_size = %d;\n" % len(compressed))
+        file.write("\n")
+
+        file.write("%}\n")
+
+        file.write("struct file_offset {\n")
+        file.write("  const char *filename;\n")
+        file.write("  size_t offset;\n")
+        file.write("  size_t size;\n")
+        file.write("};\n")
+        file.write("%%\n")
+
+        offset = 0
+        for item in file_list:
+            filename = item["filename"]
+            data = item["data"]
+            if any((ch not in acceptable_chars) for ch in filename):
+                raise ValueError(f"unacceptable character in filename: {filename}")
+            file.write('%s,%d,%d\n' % (filename, offset, len(data) - 1))
+            offset += len(data)
+
+
+if __name__ == "__main__":
+    pwd = os.getcwd()
+    try:
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
+        os.chdir("..")
+
+        os.chdir("Lib")
+        file_list = get_file_data()
+        os.chdir("..")
+        # output_list(file_list)
+        output_key_file_for_gperf(file_list)
+        subprocess.run([
+            "gperf",
+            "-L", "ANSI-C",
+            "-t",
+            "-N", "embeddedimporter_find_entry",
+            "-K", "filename",
+            "--output-file=Modules/embeddedimport_data.c",
+            "Modules/embeddedimporter_gperf_keyfile.txt"
+        ], check=True)
+    finally:
+        os.chdir(pwd)
