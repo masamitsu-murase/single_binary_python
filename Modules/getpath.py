@@ -704,6 +704,9 @@ elif not pythonpath_was_set:
     else:
         pythonpath.append(joinpath(base_prefix, ZIP_LANDMARK))
 
+    # Then add the executable itself for embeddedimport.
+    pythonpath.append(executable)
+
     if os_name == 'nt' and use_environment and winreg:
         # QUIRK: Windows also lists paths in the registry. Paths are stored
         # as the default value of each subkey of

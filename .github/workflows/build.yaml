@@ -17,11 +17,39 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
+    - name: "Disable git autoCRLF"
+      run: git config --global core.autoCRLF false
     - uses: actions/checkout@v4
       with:
         persist-credentials: false
+    - name: Get externals
+      run: cmd /c SingleBinaryBuild\get_externals.bat --tkinter-src --openssl-src --libffi-src
+    - name: Build libffi
+      run: |
+        set LIBFFI_SOURCE=%CD%\externals\libffi-3.4.4
+        set "VCVARSALL=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
+        call SingleBinaryBuild\prepare_libffi.bat -x64 --install-cygwin
+      shell: cmd
+    - name: Build openssl
+      run: cmd /c SingleBinaryBuild\prepare_ssl.bat
+    - name: Build tcl/tk
+      run: cmd /c SingleBinaryBuild\prepare_tcltk.bat
     - name: Build CPython
       run: cmd /c SingleBinaryBuild.bat
     - name: Display build info
       run: .\\python.bat -m test.pythoninfo
-    
+    - name: Prepare artifact
+      run: |
+        md artifact
+        copy SingleBinaryBuild\amd64\python.exe artifact\sbpython.exe
+        copy SingleBinaryBuild\amd64\pythonw.exe artifact\sbpythonw.exe
+      shell: cmd
+    - uses: actions/upload-artifact@v4
+      with:
+        name: python
+        path: artifact/*.exe
+    - name: Test
+      run: |
+        copy SingleBinaryBuild\amd64\python.exe .\sbpython.exe
+        .\sbpython.exe -m test.regrtest -x test_concurrent_futures test_ctypes test_distutils test_ensurepip test_idle test_importlib test_lib2to3 test_pydoc test_ttk_textonly test_unittest test_readline test_threaded_import test_venv
+      shell: cmd

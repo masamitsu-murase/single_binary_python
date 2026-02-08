@@ -84,27 +84,34 @@ extern PyObject* PyInit__opcode(void);
 extern PyObject* PyInit__contextvars(void);
 extern PyObject* PyInit__tokenize(void);
 extern PyObject* PyInit__suggestions(void);
+extern PyObject* PyInit_embeddedimport(void);
 
 /* tools/freeze/makeconfig.py marker for additional "extern" */
 /* -- ADDMODULE MARKER 1 -- */
 
 /* Built-in extension modules for static linking */
 PyMODINIT_FUNC PyInit__asyncio(void);
+PyMODINIT_FUNC PyInit__bz2(void);
 PyMODINIT_FUNC PyInit__decimal(void);
 PyMODINIT_FUNC PyInit__elementtree(void);
+PyMODINIT_FUNC PyInit__hashlib(void);
+PyMODINIT_FUNC PyInit__lzma(void);
 PyMODINIT_FUNC PyInit__multiprocessing(void);
 PyMODINIT_FUNC PyInit__overlapped(void);
 PyMODINIT_FUNC PyInit__queue(void);
 PyMODINIT_FUNC PyInit__remote_debugging(void);
 PyMODINIT_FUNC PyInit__socket(void);
+PyMODINIT_FUNC PyInit__sqlite3(void);
 PyMODINIT_FUNC PyInit__uuid(void);
 PyMODINIT_FUNC PyInit__wmi(void);
 PyMODINIT_FUNC PyInit__zoneinfo(void);
+PyMODINIT_FUNC PyInit__zstd(void);
 PyMODINIT_FUNC PyInit_pyexpat(void);
 PyMODINIT_FUNC PyInit_select(void);
 PyMODINIT_FUNC PyInit_unicodedata(void);
 PyMODINIT_FUNC PyInit_winsound(void);
 PyMODINIT_FUNC PyInit__ctypes(void);
+PyMODINIT_FUNC PyInit__ssl(void);
 
 extern PyObject* PyMarshal_Init(void);
 extern PyObject* PyInit__imp(void);
@@ -126,6 +133,7 @@ struct _inittab _PyImport_Inittab[] = {
     {"time", PyInit_time},
     {"_thread", PyInit__thread},
     {"_tokenize", PyInit__tokenize},
+    {"embeddedimport", PyInit_embeddedimport},
     {"_types", PyInit__types},
     {"_typing", PyInit__typing},
     {"_statistics", PyInit__statistics},
@@ -192,21 +200,27 @@ struct _inittab _PyImport_Inittab[] = {
 
     /* Built-in extension modules (statically linked) */
     {"_asyncio", PyInit__asyncio},
+    {"_bz2", PyInit__bz2},
     {"_decimal", PyInit__decimal},
     {"_elementtree", PyInit__elementtree},
+    // {"_hashlib", PyInit__hashlib},
+    {"_lzma", PyInit__lzma},
     {"_multiprocessing", PyInit__multiprocessing},
     {"_overlapped", PyInit__overlapped},
     {"_queue", PyInit__queue},
     {"_remote_debugging", PyInit__remote_debugging},
     {"_socket", PyInit__socket},
+    {"_sqlite3", PyInit__sqlite3},
     {"_uuid", PyInit__uuid},
     {"_wmi", PyInit__wmi},
     {"_zoneinfo", PyInit__zoneinfo},
+    {"_zstd", PyInit__zstd},
     {"pyexpat", PyInit_pyexpat},
     {"select", PyInit_select},
     {"unicodedata", PyInit_unicodedata},
     {"winsound", PyInit_winsound},
     {"_ctypes", PyInit__ctypes},
+    {"_ssl", PyInit__ssl},
 
     /* This module "lives in" with marshal.c */
     {"marshal", PyMarshal_Init},
