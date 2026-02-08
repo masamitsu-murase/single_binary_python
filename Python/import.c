@@ -4179,6 +4179,9 @@ init_embeddedimport(PyThreadState *tstate, int verbose)
 {
     PyObject *path_hooks = _PySys_GetRequiredAttrString("path_hooks");
     if (path_hooks == NULL) {
+        if (verbose) {
+            PySys_WriteStderr("# embeddedimport: failed to get path_hooks\n");
+        }
         return -1;
     }
 
@@ -4189,6 +4192,9 @@ init_embeddedimport(PyThreadState *tstate, int verbose)
     PyObject *embeddedimporter =
         PyImport_ImportModuleAttrString("embeddedimport", "embeddedimporter");
     if (embeddedimporter == NULL) {
+        if (verbose) {
+            PySys_WriteStderr("# embeddedimport: failed to get embeddedimporter\n");
+        }
         Py_DECREF(path_hooks);
         return -1;
     }
@@ -4197,6 +4203,9 @@ init_embeddedimport(PyThreadState *tstate, int verbose)
     Py_DECREF(embeddedimporter);
     Py_DECREF(path_hooks);
     if (err < 0) {
+        if (verbose) {
+            PySys_WriteStderr("# embeddedimport: failed to insert embeddedimporter\n");
+        }
         return -1;
     }
 
