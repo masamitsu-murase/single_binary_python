@@ -68,8 +68,6 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
         else:
             raise ImportError("path is not related to executable")
 
-        self._index, self._index_resource = _c._get_index()
-
     def _iter_candidates(self, fullname: str):
         modpath = _to_module_path(fullname)
         yield modpath + "/__init__.py", True
@@ -78,10 +76,12 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
 
     def _find_entry(self, fullname: str):
         for key, is_package in self._iter_candidates(fullname):
-            if self._index_resource is not None and key in self._index_resource:
-                return key, is_package, True, self._index_resource[key]
-            if key in self._index:
-                return key, is_package, False, self._index[key]
+            data_pos = _c._find_entry_in_resource(key)
+            if data_pos is not None:
+                return key, is_package, True, data_pos
+            data_pos = _c._find_entry(key)
+            if data_pos is not None:
+                return key, is_package, False, data_pos
         return None
 
     def find_spec(self, fullname: str, target=None):
@@ -156,6 +156,7 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
         if not isinstance(pathname, str):
             raise OSError(0, "", pathname)
 
+        pathname = _normalize_path(pathname)
         exe = sys.executable
         if pathname.startswith(exe):
             rel = pathname[len(exe):].lstrip("\\/")
@@ -163,12 +164,13 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
         else:
             rel = pathname.replace("\\", "/")
 
-        if self._index_resource is not None and rel in self._index_resource:
-            offset, size = self._index_resource[rel]
+        data_pos = _c._find_entry_in_resource(rel)
+        if data_pos is not None:
+            (offset, size) = data_pos
             return _c._get_data(offset, size, use_resource=True)
-
-        if rel in self._index:
-            offset, size = self._index[rel]
+        data_pos = _c._find_entry(rel)
+        if data_pos is not None:
+            (offset, size) = data_pos
             return _c._get_data(offset, size, use_resource=False)
 
         raise OSError(0, "", rel)

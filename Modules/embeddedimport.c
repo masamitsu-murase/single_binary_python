@@ -15,6 +15,14 @@ extern const size_t embeddedimporter_raw_data_size;
 extern const unsigned char embeddedimporter_raw_data_compressed[];
 extern const size_t embeddedimporter_raw_data_compressed_size;
 extern const size_t embeddedimporter_data_offset[];
+/* Same as create_embeddedimporter_gperf_keyfile.txt */
+struct file_offset {
+    const char *filename;
+    size_t offset;
+    size_t size;
+};
+struct file_offset *
+embeddedimporter_find_entry (register const char *str, register unsigned int len);
 
 #ifdef Py_BUILD_RESOURCE_EMBEDDED_MODULE
 #define USER_SOURCE_ID 200
@@ -22,7 +30,6 @@ extern const size_t embeddedimporter_data_offset[];
 
 static int embedded_data_initialized = 0;
 static unsigned char *embedded_raw_data = NULL;
-static PyObject *embedded_index = NULL;
 
 #ifdef Py_BUILD_RESOURCE_EMBEDDED_MODULE
 static int embedded_resource_initialized = 0;
@@ -31,63 +38,33 @@ static unsigned char *embedded_raw_data_resource = NULL;
 static size_t embedded_raw_data_resource_size = 0;
 static PyObject *embedded_index_resource = NULL;
 
-static PyObject *EmbeddedImportError = NULL;
-
-static int build_embedded_index(void);
 #ifdef Py_BUILD_RESOURCE_EMBEDDED_MODULE
+#error Not Implemented.
 static int ensure_resource_data(void);
 #endif
 
 static PyObject *
 load_helper_module(void)
 {
-    if (build_embedded_index() < 0) {
-        return NULL;
-    }
-
-#ifdef Py_BUILD_RESOURCE_EMBEDDED_MODULE
-    if (ensure_resource_data() < 0) {
-        return NULL;
-    }
-#endif
-
-    PyObject *entry = PyDict_GetItemString(embedded_index, "embeddedimport_helper.py");
-#ifdef Py_BUILD_RESOURCE_EMBEDDED_MODULE
-    if (entry == NULL && embedded_index_resource != NULL && embedded_index_resource != Py_None) {
-        entry = PyDict_GetItemString(embedded_index_resource, "embeddedimport_helper.py");
-    }
-#endif
+    const char filename_str[] = "embeddedimport_helper.py";
+    struct file_offset *entry = embeddedimporter_find_entry(filename_str, sizeof(filename_str) - 1);
     if (entry == NULL) {
-        PyErr_Clear();
-        return PyImport_ImportModule("embeddedimport_helper");
-    }
-
-    Py_ssize_t offset, size;
-    if (!PyArg_ParseTuple(entry, "nn", &offset, &size)) {
         return NULL;
     }
-
-    unsigned char *data = embedded_raw_data;
-#ifdef Py_BUILD_RESOURCE_EMBEDDED_MODULE
-    if (embedded_index_resource != NULL && embedded_index_resource != Py_None) {
-        if (PyDict_GetItemString(embedded_index_resource, "embeddedimport_helper.py") == entry) {
-            data = embedded_raw_data_resource;
-        }
-    }
-#endif
 
     PyObject *name = PyUnicode_FromString("embeddedimport_helper");
     if (name == NULL) {
         return NULL;
     }
 
-    PyObject *filename = PyUnicode_FromString("embeddedimport_helper.py");
+    PyObject *filename = PyUnicode_FromString(filename_str);
     if (filename == NULL) {
         Py_DECREF(name);
         return NULL;
     }
 
-    const char *buffer = (const char *)data + offset;
+    unsigned char *data = embedded_raw_data;
+    const char *buffer = (const char *)data + entry->offset;
     PyObject *code = Py_CompileStringObject(buffer, filename, Py_file_input, NULL, -1);
     if (code == NULL) {
         Py_DECREF(name);
@@ -100,20 +77,6 @@ load_helper_module(void)
     Py_DECREF(filename);
     Py_DECREF(name);
     return module;
-}
-
-static size_t
-count_filenames(const char *p)
-{
-    size_t count = 0;
-    while (*p != '\0') {
-        while (*p != '\0') {
-            p++;
-        }
-        p++;
-        count++;
-    }
-    return count;
 }
 
 static int
@@ -136,80 +99,11 @@ ensure_embedded_data(void)
     if (ZSTD_isError(result_len) || result_len != embeddedimporter_raw_data_size) {
         PyMem_Free(embedded_raw_data);
         embedded_raw_data = NULL;
-        PyErr_SetString(EmbeddedImportError, "zstd decompress failed");
+        PyErr_SetString(PyExc_ImportError, "zstd decompress failed");
         return -1;
     }
 
     embedded_data_initialized = 1;
-    return 0;
-}
-
-static int
-build_embedded_index(void)
-{
-    if (embedded_index != NULL) {
-        return 0;
-    }
-
-    if (ensure_embedded_data() < 0) {
-        return -1;
-    }
-
-    PyObject *toc = PyDict_New();
-    if (toc == NULL) {
-        return -1;
-    }
-
-    const char *p = embeddedimporter_filename;
-    size_t file_count = count_filenames(p);
-    size_t i = 0;
-
-    while (*p != '\0') {
-        const char *filename = p;
-        size_t offset, size;
-        PyObject *key, *value;
-
-        while (*p != '\0') {
-            p++;
-        }
-        p++; /* skip NULL */
-
-        offset = embeddedimporter_data_offset[i];
-        if (i + 1 < file_count) {
-            size = embeddedimporter_data_offset[i + 1] - offset;
-        } else {
-            size = embeddedimporter_raw_data_size - offset;
-        }
-        i++;
-
-        if (size > 0 && embedded_raw_data[offset + size - 1] == '\0') {
-            size -= 1;
-        }
-
-        key = PyUnicode_FromString(filename);
-        if (key == NULL) {
-            Py_DECREF(toc);
-            return -1;
-        }
-        value = Py_BuildValue("(nn)", (Py_ssize_t)offset, (Py_ssize_t)size);
-        if (value == NULL) {
-            Py_DECREF(key);
-            Py_DECREF(toc);
-            return -1;
-        }
-
-        if (PyDict_SetItem(toc, key, value) < 0) {
-            Py_DECREF(key);
-            Py_DECREF(value);
-            Py_DECREF(toc);
-            return -1;
-        }
-
-        Py_DECREF(key);
-        Py_DECREF(value);
-    }
-
-    embedded_index = toc;
     return 0;
 }
 
@@ -233,13 +127,13 @@ ensure_resource_data(void)
 
     HGLOBAL hLoadedResource = LoadResource(NULL, hResource);
     if (hLoadedResource == NULL) {
-        PyErr_SetString(EmbeddedImportError, "Failed to load resource");
+        PyErr_SetString(PyExc_ImportError, "Failed to load resource");
         return -1;
     }
 
     LPVOID pLockedResource = LockResource(hLoadedResource);
     if (pLockedResource == NULL) {
-        PyErr_SetString(EmbeddedImportError, "Failed to lock resource");
+        PyErr_SetString(PyExc_ImportError, "Failed to lock resource");
         return -1;
     }
 
@@ -247,7 +141,7 @@ ensure_resource_data(void)
     unsigned char *resource_data = (unsigned char *)pLockedResource;
 
     if (dwResourceSize < 12) {
-        PyErr_SetString(EmbeddedImportError, "Resource data too small");
+        PyErr_SetString(PyExc_ImportError, "Resource data too small");
         return -1;
     }
 
@@ -257,7 +151,7 @@ ensure_resource_data(void)
     memcpy(&file_count, resource_data + 8, 4);
 
     if (dwResourceSize < 12 + file_count * 4 + compressed_size) {
-        PyErr_SetString(EmbeddedImportError, "Invalid resource data");
+        PyErr_SetString(PyExc_ImportError, "Invalid resource data");
         return -1;
     }
 
@@ -329,26 +223,32 @@ ensure_resource_data(void)
 #endif
 
 static PyObject *
-embeddedimport_get_index(PyObject *self, PyObject *args)
+embeddedimport_find_entry(PyObject *self, PyObject *args)
 {
-    if (build_embedded_index() < 0) {
-        return NULL;
+    const char *filename;
+
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        Py_RETURN_NONE;
     }
 
-#ifdef Py_BUILD_RESOURCE_EMBEDDED_MODULE
-    if (ensure_resource_data() < 0) {
-        return NULL;
+    struct file_offset *entry = embeddedimporter_find_entry(filename, (unsigned int)strlen(filename));
+    if (entry == NULL) {
+        Py_RETURN_NONE;
     }
-#else
-    if (embedded_index_resource == NULL) {
-        embedded_index_resource = Py_None;
-        Py_INCREF(Py_None);
-    }
-#endif
 
-    Py_INCREF(embedded_index);
-    Py_INCREF(embedded_index_resource);
-    return PyTuple_Pack(2, embedded_index, embedded_index_resource);
+    return Py_BuildValue("(nn)", (Py_ssize_t)entry->offset, (Py_ssize_t)entry->size);
+}
+
+static PyObject *
+embeddedimport_find_entry_in_resource(PyObject *self, PyObject *args)
+{
+    const char *filename;
+
+    if (!PyArg_ParseTuple(args, "s", &filename)) {
+        Py_RETURN_NONE;
+    }
+
+    Py_RETURN_NONE;
 }
 
 static PyObject *
@@ -404,11 +304,46 @@ embeddedimport_get_data(PyObject *self, PyObject *args, PyObject *kwargs)
 }
 
 static PyMethodDef embeddedimport_methods[] = {
-    {"_get_index", embeddedimport_get_index, METH_NOARGS,
-     "Return (index, resource_index) for embedded data."},
+    {"_find_entry", embeddedimport_find_entry, METH_VARARGS,
+     "Return (offset, size) for embedded data."},
+    {"_find_entry_in_resource", embeddedimport_find_entry_in_resource, METH_VARARGS,
+     "Return (offset, size) for embedded data."},
     {"_get_data", (PyCFunction)embeddedimport_get_data, METH_VARARGS | METH_KEYWORDS,
      "_get_data(offset, size, use_resource=False) -> bytes"},
     {NULL, NULL}
+};
+
+static int
+embeddedimport_exec(PyObject *m)
+{
+    /* Load Python helper module from embedded data and re-export class */
+    if (ensure_embedded_data() < 0) {
+        return -1;
+    }
+
+    PyObject *helper = load_helper_module();
+    if (helper == NULL) {
+        return -1;
+    }
+
+    PyObject *cls = PyObject_GetAttrString(helper, "EmbeddedImporter");
+    Py_DECREF(helper);
+    if (cls == NULL) {
+        return -1;
+    }
+
+    if (PyModule_AddObject(m, "embeddedimporter", cls) < 0) {
+        Py_DECREF(cls);
+        return -1;
+    }
+
+    return 0;
+}
+
+static PyModuleDef_Slot embeddedimport_slots[] = {
+    {Py_mod_multiple_interpreters, Py_MOD_PER_INTERPRETER_GIL_SUPPORTED},
+    {Py_mod_exec, embeddedimport_exec},
+    {0, NULL}
 };
 
 static struct PyModuleDef embeddedimportmodule = {
@@ -417,7 +352,7 @@ static struct PyModuleDef embeddedimportmodule = {
     "Embedded importer helper module.",
     -1,
     embeddedimport_methods,
-    NULL,
+    embeddedimport_slots,
     NULL,
     NULL,
     NULL
@@ -426,45 +361,5 @@ static struct PyModuleDef embeddedimportmodule = {
 PyMODINIT_FUNC
 PyInit_embeddedimport(void)
 {
-    PyObject *m = PyModule_Create(&embeddedimportmodule);
-    if (m == NULL) {
-        return NULL;
-    }
-
-    EmbeddedImportError = PyErr_NewExceptionWithDoc(
-        "embeddedimport.EmbeddedImportError",
-        "Exception raised by embeddedimport.",
-        PyExc_ImportError,
-        NULL);
-    if (EmbeddedImportError == NULL) {
-        Py_DECREF(m);
-        return NULL;
-    }
-    if (PyModule_AddObject(m, "EmbeddedImportError", EmbeddedImportError) < 0) {
-        Py_DECREF(EmbeddedImportError);
-        Py_DECREF(m);
-        return NULL;
-    }
-
-    /* Load Python helper module from embedded data and re-export class */
-    PyObject *helper = load_helper_module();
-    if (helper == NULL) {
-        Py_DECREF(m);
-        return NULL;
-    }
-
-    PyObject *cls = PyObject_GetAttrString(helper, "EmbeddedImporter");
-    Py_DECREF(helper);
-    if (cls == NULL) {
-        Py_DECREF(m);
-        return NULL;
-    }
-
-    if (PyModule_AddObject(m, "embeddedimporter", cls) < 0) {
-        Py_DECREF(cls);
-        Py_DECREF(m);
-        return NULL;
-    }
-
-    return m;
+    return PyModuleDef_Init(&embeddedimportmodule);
 }
