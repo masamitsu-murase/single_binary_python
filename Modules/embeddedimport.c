@@ -350,7 +350,7 @@ static struct PyModuleDef embeddedimportmodule = {
     PyModuleDef_HEAD_INIT,
     "embeddedimport",
     "Embedded importer helper module.",
-    -1,
+    0,
     embeddedimport_methods,
     embeddedimport_slots,
     NULL,
@@ -363,3 +363,4 @@ PyInit_embeddedimport(void)
 {
     return PyModuleDef_Init(&embeddedimportmodule);
 }
+
