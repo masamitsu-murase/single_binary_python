@@ -156,6 +156,7 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
         if not isinstance(pathname, str):
             raise OSError(0, "", pathname)
 
+        pathname = _normalize_path(pathname)
         exe = sys.executable
         if pathname.startswith(exe):
             rel = pathname[len(exe):].lstrip("\\/")

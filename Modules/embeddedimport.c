@@ -38,8 +38,6 @@ static unsigned char *embedded_raw_data_resource = NULL;
 static size_t embedded_raw_data_resource_size = 0;
 static PyObject *embedded_index_resource = NULL;
 
-static PyObject *EmbeddedImportError = NULL;
-
 #ifdef Py_BUILD_RESOURCE_EMBEDDED_MODULE
 #error Not Implemented.
 static int ensure_resource_data(void);
@@ -101,7 +99,7 @@ ensure_embedded_data(void)
     if (ZSTD_isError(result_len) || result_len != embeddedimporter_raw_data_size) {
         PyMem_Free(embedded_raw_data);
         embedded_raw_data = NULL;
-        PyErr_SetString(EmbeddedImportError, "zstd decompress failed");
+        PyErr_SetString(PyExc_ImportError, "zstd decompress failed");
         return -1;
     }
 
@@ -129,13 +127,13 @@ ensure_resource_data(void)
 
     HGLOBAL hLoadedResource = LoadResource(NULL, hResource);
     if (hLoadedResource == NULL) {
-        PyErr_SetString(EmbeddedImportError, "Failed to load resource");
+        PyErr_SetString(PyExc_ImportError, "Failed to load resource");
         return -1;
     }
 
     LPVOID pLockedResource = LockResource(hLoadedResource);
     if (pLockedResource == NULL) {
-        PyErr_SetString(EmbeddedImportError, "Failed to lock resource");
+        PyErr_SetString(PyExc_ImportError, "Failed to lock resource");
         return -1;
     }
 
@@ -143,7 +141,7 @@ ensure_resource_data(void)
     unsigned char *resource_data = (unsigned char *)pLockedResource;
 
     if (dwResourceSize < 12) {
-        PyErr_SetString(EmbeddedImportError, "Resource data too small");
+        PyErr_SetString(PyExc_ImportError, "Resource data too small");
         return -1;
     }
 
@@ -153,7 +151,7 @@ ensure_resource_data(void)
     memcpy(&file_count, resource_data + 8, 4);
 
     if (dwResourceSize < 12 + file_count * 4 + compressed_size) {
-        PyErr_SetString(EmbeddedImportError, "Invalid resource data");
+        PyErr_SetString(PyExc_ImportError, "Invalid resource data");
         return -1;
     }
 
@@ -315,8 +313,36 @@ static PyMethodDef embeddedimport_methods[] = {
     {NULL, NULL}
 };
 
+static int
+embeddedimport_exec(PyObject *m)
+{
+    /* Load Python helper module from embedded data and re-export class */
+    if (ensure_embedded_data() < 0) {
+        return -1;
+    }
+
+    PyObject *helper = load_helper_module();
+    if (helper == NULL) {
+        return -1;
+    }
+
+    PyObject *cls = PyObject_GetAttrString(helper, "EmbeddedImporter");
+    Py_DECREF(helper);
+    if (cls == NULL) {
+        return -1;
+    }
+
+    if (PyModule_AddObject(m, "embeddedimporter", cls) < 0) {
+        Py_DECREF(cls);
+        return -1;
+    }
+
+    return 0;
+}
+
 static PyModuleDef_Slot embeddedimport_slots[] = {
     {Py_mod_multiple_interpreters, Py_MOD_PER_INTERPRETER_GIL_SUPPORTED},
+    {Py_mod_exec, embeddedimport_exec},
     {0, NULL}
 };
 
@@ -335,45 +361,5 @@ static struct PyModuleDef embeddedimportmodule = {
 PyMODINIT_FUNC
 PyInit_embeddedimport(void)
 {
-    PyObject *m = PyModule_Create(&embeddedimportmodule);
-    if (m == NULL) {
-        return NULL;
-    }
-
-    EmbeddedImportError = PyErr_NewExceptionWithDoc(
-        "embeddedimport.EmbeddedImportError",
-        "Exception raised by embeddedimport.",
-        PyExc_ImportError,
-        NULL);
-    if (EmbeddedImportError == NULL) {
-        Py_DECREF(m);
-        return NULL;
-    }
-    if (PyModule_AddObject(m, "EmbeddedImportError", EmbeddedImportError) < 0) {
-        Py_DECREF(EmbeddedImportError);
-        Py_DECREF(m);
-        return NULL;
-    }
-
-    /* Load Python helper module from embedded data and re-export class */
-    PyObject *helper = load_helper_module();
-    if (helper == NULL) {
-        Py_DECREF(m);
-        return NULL;
-    }
-
-    PyObject *cls = PyObject_GetAttrString(helper, "EmbeddedImporter");
-    Py_DECREF(helper);
-    if (cls == NULL) {
-        Py_DECREF(m);
-        return NULL;
-    }
-
-    if (PyModule_AddObject(m, "embeddedimporter", cls) < 0) {
-        Py_DECREF(cls);
-        Py_DECREF(m);
-        return NULL;
-    }
-
-    return m;
+    return PyModuleDef_Init(&embeddedimportmodule);
 }
