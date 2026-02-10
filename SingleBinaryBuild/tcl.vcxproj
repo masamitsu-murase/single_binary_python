@@ -63,7 +63,7 @@
     <NMakeBuildCommandLine>setlocal
 set VCINSTALLDIR=$(VCInstallDir)
 cd /D "$(tclDir)win"
-nmake -f makefile.vc MACHINE=$(TclMachine) OPTS=$(TclOpts) $(TclDirs) $(DebugFlags) $(WarningsFlags) TCLSH_NATIVE="$(tclWin32Exe)" core shell dlls
+nmake -f makefile.vc MACHINE=$(TclMachine) OPTS=$(TclOpts) $(TclDirs) $(DebugFlags) $(WarningsFlags) TCLSH_NATIVE="$(tclWin32Exe)" core
 nmake -f makefile.vc MACHINE=$(TclMachine) OPTS=$(TclOpts) $(TclDirs) $(DebugFlags) $(WarningsFlags) TCLSH_NATIVE="$(tclWin32Exe)" install-binaries install-libraries
 copy /Y $(tclDir)win\nmakehlp.exe $(tkDir)win\nmakehlp.exe
 </NMakeBuildCommandLine>
