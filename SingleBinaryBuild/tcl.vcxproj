@@ -60,12 +60,12 @@
     <TclDirs>BUILDDIRTOP="$(BuildDirTop)" INSTALLDIR="$(OutDir.TrimEnd(`\`))" INSTALL_DIR="$(OutDir.TrimEnd(`\`))"</TclDirs>
     <DebugFlags Condition="'$(Configuration)' == 'Debug'">DEBUGFLAGS="-wd4456 -wd4457 -wd4458 -wd4459 -wd4996"</DebugFlags>
     <WarningsFlags>WARNINGS="-W3 -wd4311 -wd4312"</WarningsFlags>
-    <NMakeBuildCommandLine>setlocal
     <!-- Workaround for zlib1.dll -->
+    <NMakeBuildCommandLine>setlocal
 set VCINSTALLDIR=$(VCInstallDir)
 cd /D "$(tclDir)win"
 nmake -f makefile.vc MACHINE=$(TclMachine) OPTS=$(TclOpts) $(TclDirs) $(DebugFlags) $(WarningsFlags) TCLSH_NATIVE="$(tclWin32Exe)" core
-copy $(tclDir)compat\zlib\win64\zlib1.dll $(tcltkDir)bin\zlib1.dll
+for /d %%D in ($(tclDir)win\*) do copy $(tclDir)compat\zlib\win64\zlib1.dll "%%D\zlib1.dll"
 nmake -f makefile.vc MACHINE=$(TclMachine) OPTS=$(TclOpts) $(TclDirs) $(DebugFlags) $(WarningsFlags) TCLSH_NATIVE="$(tclWin32Exe)" install-binaries install-libraries
 copy /Y $(tclDir)win\nmakehlp.exe $(tkDir)win\nmakehlp.exe
 </NMakeBuildCommandLine>
