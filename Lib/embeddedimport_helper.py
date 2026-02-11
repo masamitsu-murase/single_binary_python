@@ -1,4 +1,4 @@
-"""EmbeddedImporter helper (Python 3.13).
+"""EmbeddedImporter helper
 
 Implements a PEP 451-compatible path-hook importer backed by the
 embedded data exposed from the built-in 'embeddedimport' module.

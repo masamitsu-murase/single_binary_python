@@ -1,4 +1,4 @@
-# EmbeddedImporter 実装の詳細（Python 3.13 対応版）
+# EmbeddedImporter 実装の詳細（Python 3.14 対応版）
 
 ## 概要
 
@@ -335,121 +335,53 @@ struct _inittab _PyImport_Inittab[] = {
 
 ---
 
-## Python 3.13 の現状との差分と修正方針（zipimport を基準に整理）
+## CPython への変更箇所一覧
+
+以下は、EmbeddedImporter を CPython 3.14 に組み込むために加えた変更の一覧です。
 
 ### 1. Builtin 登録（PC/config.c）
 
-**現状**: [PC/config.c](PC/config.c) に `embeddedimport` の登録がありません。
+`embeddedimport` を組み込みモジュールとして `_PyImport_Inittab[]` に登録済み：
 
-**修正方針**:
-- `PyInit_embeddedimport()` の extern 宣言を追加
-- `_PyImport_Inittab` に `{"embeddedimport", PyInit_embeddedimport}` を追加
+```c
+extern PyObject* PyInit_embeddedimport(void);
 
-**目的**:
-`embeddedimport` モジュールを組み込みモジュールとして登録し、ファイルシステム無しで import 可能にする。
+struct _inittab _PyImport_Inittab[] = {
+    ...
+    {"embeddedimport", PyInit_embeddedimport},
+    ...
+};
+```
+
+これにより、ファイルシステム無しで `import embeddedimport` が可能。
 
 ### 2. `sys.path_hooks` 挿入（Python/import.c）
 
-**現状**: [Python/import.c](Python/import.c) に EmbeddedImporter 追加処理は存在しません。
+`_PyImport_InitExternal()` 内で `init_zipimport()` の直後に `init_embeddedimport()` を呼び出し済み：
 
-**修正方針**:
-- `_PyImport_InitExternal()` 内の `init_zipimport()` 呼び出し直後に EmbeddedImporter 初期化関数を追加
-- `embeddedimport` モジュールを import
-- `embeddedimporter` クラスを取得
-- `sys.path_hooks` の **先頭（index 0）** に挿入: `PyList_Insert(path_hooks, 0, embeddedimporter)`
-
-**zipimport との整合性**:
-- `init_zipimport()` は `PyList_Insert(path_hooks, 0, zipimporter)` で zipimporter を先頭に挿入します
-- EmbeddedImporter を**その後に index 0 へ挿入**することで、最終的な検索順は `embeddedimporter` → `zipimporter` → `FileFinder` → ... となります
-- これにより、実行ファイル内のモジュールが最優先で検索されます
-
-### 3. 初期化タイミング（Python/pylifecycle.c）
-
-**現状**: [Python/pylifecycle.c](Python/pylifecycle.c#L1205-L1235) では `_PyImport_InitExternal()` を呼ぶのみ。
-
-**修正方針**:
-- `_PyImport_InitExternal()` の内部で EmbeddedImporter を登録する（または呼び出し直後に追加）
-- zipimport の初期化が終わっていることが必須
-
-### 4. 内部ヘッダ（Include/internal/pycore_pylifecycle.h）
-
-**現状**: `_PyImportEmbedded_Init()` の宣言は存在しない。
-
-**修正方針**:
-- 追加する場合は宣言を `pycore_pylifecycle.h` に入れる
-
-### 5. Modules/embeddedimport_data.c
-
-**生成方法**: [SingleBinaryBuild/create_embeddedimporter_data.py](SingleBinaryBuild/create_embeddedimporter_data.py) によって自動生成
-
-**内容**:
 ```c
-char embeddedimporter_filename[];
-const size_t embeddedimporter_raw_data_size;
-const unsigned char embeddedimporter_raw_data_compressed[];
-const size_t embeddedimporter_raw_data_compressed_size;
-const size_t embeddedimporter_data_offset[];
+PyStatus _PyImport_InitExternal(PyThreadState *tstate) {
+    init_importlib_external(tstate->interp);
+    init_zipimport(tstate, verbose);
+    init_embeddedimport(tstate, verbose);   // ← 追加
+}
 ```
 
-**目的**:
-埋め込むファイルの実データを提供します。ビルド時に生成され、実行ファイルにリンクされます。
+`init_embeddedimport()` は `embeddedimport.embeddedimporter` を import し、`PyList_Insert(path_hooks, 0, ...)` で `sys.path_hooks` の先頭に挿入する。最終的な検索順は `embeddedimporter` → `zipimporter` → `FileFinder` → ... となる。
 
-### 6. SingleBinaryBuild/create_embeddedimporter_data.py
+### 3. ビルドシステム（pythoncore.vcxproj）
 
-**機能**:
-1. `Lib/` ディレクトリ配下の `.py` ファイルを再帰的に収集
-2. テストファイル、`__pycache__` などをスキップ
-3. Python ファイルのコメントを削除して容量削減
-4. `.pickle` ファイル（lib2to3 用）や特定のリソースファイルも含める
-5. すべてのデータを zlib 圧縮
-6. C ソースコード形式で `Modules/embeddedimport_data.c` に出力
+以下の 2 ファイルを `pythoncore` のコンパイル対象に追加済み：
 
-**主要処理**:
-```python
-def get_file_data():
-    # ファイル収集とフィルタリング
-    # コメント削除処理
-    # バイナリデータの結合
+- `Modules/embeddedimport.c` — C ブリッジモジュール
+- `Modules/embeddedimport_data.c` — gperf 生成の完全ハッシュテーブル + 圧縮データ
 
-def output_list(file_list):
-    # C言語のデータ配列として出力
-    # 圧縮とオフセットテーブルの生成
-```
+リンク時に `libzstd_static.lib` が必要。
 
-### 7. ビルドシステム（SingleBinaryBuild）
+### 4. データ生成（ビルド前ステップ）
 
-**必要な変更**:
-- `Modules/embeddedimport.c` をビルド対象に追加
-- `Modules/embeddedimport_data.c` をビルド対象に追加
-- zlib ライブラリとのリンク
-- ビルド前に `create_embeddedimporter_data.py` を実行
-- （オプション）リソース埋め込み用のビルドステップ
+`SingleBinaryBuild/create_embeddedimporter_data.py` をビルド前に実行し、`Modules/embeddedimport_data.c` を生成する必要がある。
 
-### 8. Windows リソース対応（オプション）
+### 5. Windows リソース対応（オプション・未完成）
 
-**条件**: `Py_BUILD_RESOURCE_EMBEDDED_MODULE` が定義されている場合
-
-**追加処理**:
-- Windows リソーススクリプト（.rc ファイル）に埋め込みデータを追加
-- リソース ID `200` (`USER_SOURCE_ID`) でバイナリデータを埋め込み
-- 実行時に `FindResource()`, `LoadResource()` でアクセス
-
-**利点**:
-- ビルド後にリソースを追加・変更可能
-- 動的なライブラリの追加が容易
-
----
-
-## まとめ（Python 3.13 の要点）
-
-EmbeddedImporter は、以下の技術を組み合わせて実現されています：
-
-1. **データ埋め込み**: ビルド時に全ライブラリを C 配列として埋め込み
-2. **圧縮**: zlib による効率的な容量削減
-3. **Import Protocol**: Python 3.13 の `sys.path_hooks` / `zipimporter` と整合する必要がある
-4. **最適化**: グローバルキャッシュによる複数インスタンス間でのデータ共有
-5. **柔軟性**: コンパイル時データとリソースデータの両対応
-
-**重要ポイント**: 3.13 では `zipimporter` が `init_zipimport()` 内で `sys.path_hooks` に挿入されるため、EmbeddedImporter は **zipimport の後に** `sys.path_hooks` の先頭へ入れるのが最も自然です。また、長期的には `find_module/load_module` ではなく **PEP 451 (`find_spec/create_module/exec_module`)** を実装して zipimporter と同等のインターフェースに寄せるのが妥当です。
-
-この仕組みにより、外部ファイルなしで動作する単一バイナリの Python 実行環境を実現しています。
+`Py_BUILD_RESOURCE_EMBEDDED_MODULE` 定義時に Windows リソース（リソース ID `200`）から動的にデータを読み込む機能が存在するが、現在は `#error Not Implemented.` により無効化されている。
