@@ -20,7 +20,7 @@
     <tclExternalTommath Condition="$(TclMajorVersion) == '9'">TCL_WITH_EXTERNAL_TOMMATH;</tclExternalTommath>
 
     <!--<TclDebugExt Condition="'$(Configuration)' == 'Debug'">g</TclDebugExt>-->
-    <tcltkSuffix Condition="'$(TclMajorVersion)' == '8'">t</tcltkSuffix>
+    <tcltkSuffix Condition="'$(TclMajorVersion)' == '8'">ts</tcltkSuffix>
     <tkPrefix Condition="'$(TclMajorVersion)' == '9'">tcl9</tkPrefix>
     <tclDLLName >tcl$(TclMajorVersion)$(TclMinorVersion)$(tcltkSuffix)$(TclDebugExt).dll</tclDLLName>
     <tclLibName>tcl$(TclMajorVersion)$(TclMinorVersion)$(tcltkSuffix)$(TclDebugExt).lib</tclLibName>

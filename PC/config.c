@@ -112,6 +112,7 @@ PyMODINIT_FUNC PyInit_unicodedata(void);
 PyMODINIT_FUNC PyInit_winsound(void);
 PyMODINIT_FUNC PyInit__ctypes(void);
 PyMODINIT_FUNC PyInit__ssl(void);
+PyMODINIT_FUNC PyInit__tkinter(void);
 
 extern PyObject* PyMarshal_Init(void);
 extern PyObject* PyInit__imp(void);
@@ -203,7 +204,7 @@ struct _inittab _PyImport_Inittab[] = {
     {"_bz2", PyInit__bz2},
     {"_decimal", PyInit__decimal},
     {"_elementtree", PyInit__elementtree},
-    // {"_hashlib", PyInit__hashlib},
+    {"_hashlib", PyInit__hashlib},
     {"_lzma", PyInit__lzma},
     {"_multiprocessing", PyInit__multiprocessing},
     {"_overlapped", PyInit__overlapped},
@@ -221,6 +222,7 @@ struct _inittab _PyImport_Inittab[] = {
     {"winsound", PyInit_winsound},
     {"_ctypes", PyInit__ctypes},
     {"_ssl", PyInit__ssl},
+    {"_tkinter", PyInit__tkinter},
 
     /* This module "lives in" with marshal.c */
     {"marshal", PyMarshal_Init},
