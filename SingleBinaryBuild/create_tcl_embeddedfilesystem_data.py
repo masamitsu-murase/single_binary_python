@@ -30,7 +30,6 @@ def _iter_files(base: pathlib.Path) -> tuple[list[Entry], bytes]:
             raise FileNotFoundError(f"Missing directory: {top_dir}")
 
         for root, dirs, files in os.walk(top_dir):
-            dirs.sort()
             files.sort()
 
             root_path = pathlib.Path(root)
@@ -47,7 +46,7 @@ def _iter_files(base: pathlib.Path) -> tuple[list[Entry], bytes]:
                 payload.extend(content)
                 entries.append(Entry(rel_name, False, offset, len(content)))
 
-    entries.sort(key=lambda e: (0 if e.is_dir else 1, e.name))
+    entries.sort(key=lambda e: (e.name, 0 if e.is_dir else 1))
     return entries, bytes(payload)
 
 
