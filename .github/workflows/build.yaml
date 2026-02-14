@@ -36,8 +36,6 @@ jobs:
       run: cmd /c SingleBinaryBuild\prepare_tcltk.bat
     - name: Build CPython
       run: cmd /c SingleBinaryBuild.bat
-    - name: Display build info
-      run: .\\python.bat -m test.pythoninfo
     - name: Prepare artifact
       run: |
         md artifact
@@ -48,6 +46,8 @@ jobs:
       with:
         name: python
         path: artifact/*.exe
+    - name: Display build info
+      run: .\\python.bat -m test.pythoninfo
     - name: Test
       run: |
         copy SingleBinaryBuild\amd64\python.exe .\sbpython.exe
