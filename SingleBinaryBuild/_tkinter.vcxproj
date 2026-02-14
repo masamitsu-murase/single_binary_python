@@ -94,9 +94,9 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(tcltkDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(zstdDir)lib;$(tcltkDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="$(TclMajorVersion) == '9'">TCL_WITH_EXTERNAL_TOMMATH;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions>WITH_APPINIT;STATIC_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WITH_APPINIT;STATIC_BUILD;WITH_EMBEDDED_TCLTK_FILESYSTEM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(BuildForRelease)' != 'true'">Py_TCLTK_DIR="$(tcltkDir.TrimEnd('\').Replace('\', '\\'))";%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -105,6 +105,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Modules\_tkinter.c" />
+    <ClCompile Include="..\Modules\_tkinter_tclEmbeddedFilesystem.c" />
+    <ClCompile Include="..\Modules\_tkinter_tclEmbeddedFilesystemData.c" />
     <ClCompile Include="..\Modules\tkappinit.c" />
   </ItemGroup>
   <ItemGroup>
