@@ -7,6 +7,22 @@
 
 #include "_tkinter_tclEmbeddedFilesystemData.h"
 
+#ifndef F_OK
+#    define F_OK 00
+#endif
+#ifndef X_OK
+#    define X_OK 01
+#endif
+#ifndef W_OK
+#    define W_OK 02
+#endif
+#ifndef R_OK
+#    define R_OK 04
+#endif
+#ifndef O_ACCMODE
+#    define O_ACCMODE (O_RDONLY | O_WRONLY | O_RDWR)
+#endif
+
 #define EMBEDDED_FS_PREFIX "embeddedfs:/"
 #define EMBEDDED_FS_PREFIX_LEN 11
 
