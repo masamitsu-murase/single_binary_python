@@ -24,7 +24,7 @@
 #endif
 
 #define EMBEDDED_FS_PREFIX "embeddedfs:/"
-#define EMBEDDED_FS_PREFIX_LEN 11
+#define EMBEDDED_FS_PREFIX_LEN (sizeof(EMBEDDED_FS_PREFIX) - 1)
 
 typedef struct {
     const unsigned char *content;
