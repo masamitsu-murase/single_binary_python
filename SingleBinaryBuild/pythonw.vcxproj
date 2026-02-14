@@ -108,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\PC\pythonw_exe.rc" />
+    <ResourceCompile Include="$(tkDir)win\rc\tk_base.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\PC\WinMain.c" />
