@@ -1,6 +1,6 @@
 #include "_tkinter_tclEmbeddedFilesystemData.h"
 
-#include <stdlib.h>
+#include "Python.h"
 #include <string.h>
 
 #include <zstd.h>
@@ -60213,7 +60213,7 @@ EmbeddedFileInfoDataInitialize(void)
     }
 
     if (gUncompressedDataSize == 0) {
-        gUncompressedData = (unsigned char *)malloc(1);
+        gUncompressedData = (unsigned char *)PyMem_Malloc(1);
         if (gUncompressedData == NULL) {
             return -1;
         }
@@ -60221,7 +60221,7 @@ EmbeddedFileInfoDataInitialize(void)
     else {
         size_t result;
 
-        gUncompressedData = (unsigned char *)malloc(gUncompressedDataSize);
+        gUncompressedData = (unsigned char *)PyMem_Malloc(gUncompressedDataSize);
         if (gUncompressedData == NULL) {
             return -1;
         }
@@ -60231,7 +60231,7 @@ EmbeddedFileInfoDataInitialize(void)
                                  gCompressedData,
                                  gCompressedDataSize);
         if (ZSTD_isError(result) || result != gUncompressedDataSize) {
-            free(gUncompressedData);
+            PyMem_Free(gUncompressedData);
             gUncompressedData = NULL;
             return -1;
         }
