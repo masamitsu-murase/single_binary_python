@@ -56,6 +56,10 @@ Copyright (C) 1994 Steen Lumholt.
 
 #include "tkinter.h"
 
+#ifdef WITH_EMBEDDED_TCLTK_FILESYSTEM
+int TclEmbeddedFilesystemRegister(void);
+#endif
+
 #if TK_HEX_VERSION < 0x0805020c
 #error "Tk older than 8.5.12 not supported"
 #endif
@@ -140,6 +144,17 @@ _get_tcl_lib_path(void)
 {
     static PyObject *tcl_library_path = NULL;
     static int already_checked = 0;
+
+#ifdef WITH_EMBEDDED_TCLTK_FILESYSTEM
+    if (already_checked == 0) {
+        tcl_library_path = PyUnicode_FromString("embeddedfs:/tcl" TCL_VERSION);
+        if (tcl_library_path == NULL) {
+            return NULL;
+        }
+        already_checked = 1;
+    }
+    return tcl_library_path;
+#endif
 
     if (already_checked == 0) {
         struct stat stat_buf;
@@ -3477,6 +3492,15 @@ PyInit__tkinter(void)
         return NULL;
 #ifdef Py_GIL_DISABLED
     PyUnstable_Module_SetGIL(m, Py_MOD_GIL_NOT_USED);
+#endif
+
+#ifdef WITH_EMBEDDED_TCLTK_FILESYSTEM
+    if (TclEmbeddedFilesystemRegister() != TCL_OK) {
+        PyErr_SetString(PyExc_RuntimeError,
+                        "failed to register embedded Tcl/Tk filesystem");
+        Py_DECREF(m);
+        return NULL;
+    }
 #endif
 
     Tkinter_TclError = PyErr_NewException("_tkinter.TclError", NULL, NULL);
