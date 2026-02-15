@@ -355,7 +355,7 @@ Python 標準ライブラリの `.py` ファイルを実行ファイル内に埋
 
 EmbeddedImporter の実装詳細（データ生成パイプライン、C モジュール API、Python ヘルパーの設計、初期化フローなど）は、以下のドキュメントを参照してください：
 
-→ **[embeddedimporter_summary.md](../../embeddedimporter_summary.md)**
+→ **[embeddedimporter_summary.md](./embeddedimporter_summary.md)**
 
 ---
 
@@ -375,16 +375,15 @@ EmbeddedImporter の実装詳細（データ生成パイプライン、C モジ�
 | ファイル | 説明 |
 |---|---|
 | [create_embeddedimporter_data.py](../create_embeddedimporter_data.py) | Lib/ 配下の .py ファイルを収集・圧縮し、gperf 入力ファイルを生成 |
-| [convert_modules_to_static.py](../convert_modules_to_static.py) | vcxproj ファイルを DLL → StaticLibrary に自動変換するスクリプト |
-| [Convert-ModulesToStatic.ps1](../Convert-ModulesToStatic.ps1) | PowerShell 版の vcxproj 変換スクリプト |
-| [Fix-StaticModules.ps1](../Fix-StaticModules.ps1) | 静的モジュールの TargetExt 修正と pymodule_static.props インポート追加 |
-| [Get-ModuleGuids.ps1](../Get-ModuleGuids.ps1) | 各モジュールの ProjectGuid を抽出し、ProjectReference XML を生成 |
-| [Set-ModuleTargetNames.ps1](../Set-ModuleTargetNames.ps1) | 未実装 |
-| [builtin_modules.py](../builtin_modules.py) | 静的リンク対象モジュールの分類リスト |
+| [create_tcl_embeddedfilesystem_data.py](../create_tcl_embeddedfilesystem_data.py) | Tcl/Tk ライブラリファイルを収集し、埋め込み用 C データを生成 |
+| [prepare_ssl.bat](../prepare_ssl.bat) | OpenSSL を静的リンク向け設定でビルドする準備スクリプト |
+| [prepare_ssl.py](../prepare_ssl.py) | OpenSSL 準備処理の本体（バージョン判定・取得・設定処理） |
+| [prepare_libffi.bat](../prepare_libffi.bat) | libffi を静的ライブラリとしてビルドする準備スクリプト |
+| [prepare_tcltk.bat](../prepare_tcltk.bat) | Tcl/Tk を静的ライブラリとしてビルドする準備スクリプト |
+| [get_external.py](../get_external.py) | 外部依存の取得処理を行う補助スクリプト |
 
 ### ドキュメント
 
 | ファイル | 説明 |
 |---|---|
-| [STATIC_BUILD_COMPLETED.md](../STATIC_BUILD_COMPLETED.md) | 静的ビルド完了報告（変更内容と成果物の記録） |
-| [STATIC_BUILD_PLAN.md](../STATIC_BUILD_PLAN.md) | 静的ビルド変更計画（問題点と対応方針） |
+| [changes_from_v3.14.2.md](./changes_from_v3.14.2.md) | `v3.14.2` から現行 HEAD までの主要差分サマリ |
