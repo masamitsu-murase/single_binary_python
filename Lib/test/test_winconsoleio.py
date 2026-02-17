@@ -11,7 +11,10 @@ from test.support import os_helper, requires_resource
 if sys.platform != 'win32':
     raise unittest.SkipTest("test only relevant on win32")
 
-from _testconsole import write_input
+try:
+    from _testconsole import write_input
+except ModuleNotFoundError:
+    write_input = None
 
 ConIO = io._WindowsConsoleIO
 

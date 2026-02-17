@@ -592,6 +592,7 @@ class CAPIExceptionFormattingMixin:
     LEGACY = 0
 
     def get_exception(self, callable, slice_start=0, slice_end=-1):
+        raise unittest.SkipTest("_testcapi is not supported")
         from _testcapi import exception_print
         try:
             callable()
@@ -1838,6 +1839,7 @@ class TracebackFormatMixin:
 
     @cpython_only
     def check_traceback_format(self, cleanup_func=None):
+        raise unittest.SkipTest("_testcapi is not supported")
         from _testcapi import traceback_print
         try:
             self.some_exception()
@@ -2122,6 +2124,7 @@ class TracebackFormatMixin:
         if self.DEBUG_RANGES:
             self._check_recursive_traceback_display(traceback.print_exc)
         else:
+            raise unittest.SkipTest("_testcapi is not supported")
             from _testcapi import exception_print
             def render_exc():
                 exception_print(sys.exception())
@@ -2141,6 +2144,7 @@ class TracebackFormatMixin:
 
     @cpython_only
     def test_unhashable(self):
+        raise unittest.SkipTest("_testcapi is not supported")
         from _testcapi import exception_print
 
         class UnhashableException(Exception):
@@ -2175,6 +2179,7 @@ class TracebackFormatMixin:
     @cpython_only
     @support.skip_emscripten_stack_overflow()
     def test_exception_group_deep_recursion_capi(self):
+        raise unittest.SkipTest("_testcapi is not supported")
         from _testcapi import exception_print
         LIMIT = 75
         eg = self.deep_eg()
@@ -2198,6 +2203,7 @@ class TracebackFormatMixin:
 
     @cpython_only
     def test_print_exception_bad_type_capi(self):
+        raise unittest.SkipTest("_testcapi is not supported")
         from _testcapi import exception_print
         with captured_output("stderr") as stderr:
             with support.catch_unraisable_exception():
@@ -3070,6 +3076,7 @@ class CExcReportingTests(BaseExceptionReportingTests, unittest.TestCase):
 
     @cpython_only
     def get_report(self, e):
+        raise unittest.SkipTest("_testcapi is not supported")
         from _testcapi import exception_print
         e = self.get_exception(e)
         with captured_output("stderr") as s:
@@ -4852,6 +4859,7 @@ class TestColorizedTraceback(unittest.TestCase):
         def foo():
             1/0
 
+        raise unittest.SkipTest("_testcapi is not supported")
         from _testcapi import exception_print
         try:
             foo()

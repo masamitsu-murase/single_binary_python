@@ -856,7 +856,10 @@ class ClassTests(unittest.TestCase):
                 pass
 
 
-from _testinternalcapi import has_inline_values
+try:
+    from _testinternalcapi import has_inline_values
+except ImportError:
+    has_inline_values = None
 
 Py_TPFLAGS_INLINE_VALUES = (1 << 2)
 Py_TPFLAGS_MANAGED_DICT = (1 << 4)
@@ -888,7 +891,8 @@ class TestInlineValues(unittest.TestCase):
         flags = NoManagedDict.__flags__
         self.assertEqual(flags & Py_TPFLAGS_MANAGED_DICT, 0)
         self.assertEqual(flags & Py_TPFLAGS_INLINE_VALUES, 0)
-        self.assertFalse(has_inline_values(NoManagedDict()))
+        if has_inline_values is not None:
+            self.assertFalse(has_inline_values(NoManagedDict()))
 
     def test_both_flags_for_regular_class(self):
         for cls in (Plain, WithAttrs):
@@ -896,36 +900,43 @@ class TestInlineValues(unittest.TestCase):
                 flags = cls.__flags__
                 self.assertEqual(flags & Py_TPFLAGS_MANAGED_DICT, Py_TPFLAGS_MANAGED_DICT)
                 self.assertEqual(flags & Py_TPFLAGS_INLINE_VALUES, Py_TPFLAGS_INLINE_VALUES)
-                self.assertTrue(has_inline_values(cls()))
+                if has_inline_values is not None:
+                    self.assertTrue(has_inline_values(cls()))
 
     def test_managed_dict_only_for_varsized_subclass(self):
         flags = VarSizedSubclass.__flags__
         self.assertEqual(flags & Py_TPFLAGS_MANAGED_DICT, Py_TPFLAGS_MANAGED_DICT)
         self.assertEqual(flags & Py_TPFLAGS_INLINE_VALUES, 0)
-        self.assertFalse(has_inline_values(VarSizedSubclass()))
+        if has_inline_values is not None:
+            self.assertFalse(has_inline_values(VarSizedSubclass()))
 
     def test_has_inline_values(self):
         c = Plain()
-        self.assertTrue(has_inline_values(c))
+        if has_inline_values is not None:
+            self.assertTrue(has_inline_values(c))
         del c.__dict__
-        self.assertFalse(has_inline_values(c))
+        if has_inline_values is not None:
+            self.assertFalse(has_inline_values(c))
 
     def test_instances(self):
-        self.assertTrue(has_inline_values(Plain()))
-        self.assertTrue(has_inline_values(WithAttrs()))
+        if has_inline_values is not None:
+            self.assertTrue(has_inline_values(Plain()))
+            self.assertTrue(has_inline_values(WithAttrs()))
 
     def test_inspect_dict(self):
         for cls in (Plain, WithAttrs):
             c = cls()
             c.__dict__
-            self.assertTrue(has_inline_values(c))
+            if has_inline_values is not None:
+                self.assertTrue(has_inline_values(c))
 
     def test_update_dict(self):
         d = { "e": 5, "f": 6 }
         for cls in (Plain, WithAttrs):
             c = cls()
             c.__dict__.update(d)
-            self.assertTrue(has_inline_values(c))
+            if has_inline_values is not None:
+                self.assertTrue(has_inline_values(c))
 
     @staticmethod
     def set_100(obj):
@@ -939,20 +950,25 @@ class TestInlineValues(unittest.TestCase):
     def test_many_attributes(self):
         class C: pass
         c = C()
-        self.assertTrue(has_inline_values(c))
+        if has_inline_values is not None:
+            self.assertTrue(has_inline_values(c))
         self.set_100(c)
-        self.assertFalse(has_inline_values(c))
+        if has_inline_values is not None:
+            self.assertFalse(has_inline_values(c))
         self.check_100(c)
         c = C()
-        self.assertTrue(has_inline_values(c))
+        if has_inline_values is not None:
+            self.assertTrue(has_inline_values(c))
 
     def test_many_attributes_with_dict(self):
         class C: pass
         c = C()
         d = c.__dict__
-        self.assertTrue(has_inline_values(c))
+        if has_inline_values is not None:
+            self.assertTrue(has_inline_values(c))
         self.set_100(c)
-        self.assertFalse(has_inline_values(c))
+        if has_inline_values is not None:
+            self.assertFalse(has_inline_values(c))
         self.check_100(c)
 
     def test_bug_117750(self):
