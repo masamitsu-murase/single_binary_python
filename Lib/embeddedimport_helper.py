@@ -6,12 +6,13 @@ embedded data exposed from the built-in 'embeddedimport' module.
 
 import _frozen_importlib_external as _bootstrap_external
 import _frozen_importlib as _bootstrap
-import os
 import sys
 
 
 _c = None
 _executable = sys.executable
+path_sep = _bootstrap_external.path_sep
+alt_path_sep = _bootstrap_external.path_separators[1:]
 
 
 def _load_c_extension():
@@ -37,11 +38,14 @@ def _to_module_path(fullname: str) -> str:
 
 
 def _normalize_path(path: str) -> str:
-    return os.path.normcase(os.path.normpath(path))
+    if alt_path_sep:
+        path = path.replace(alt_path_sep, path_sep)
+    return path
 
 
 def _to_os_path(executable: str, embedded_path: str) -> str:
-    return os.path.join(executable, embedded_path.replace("/", os.sep))
+    os_embedded_path = embedded_path.replace("/", path_sep)
+    return _bootstrap_external._path_join(executable, os_embedded_path)
 
 
 class EmbeddedImporter(_bootstrap_external._LoaderBasics):
@@ -62,9 +66,9 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
 
         if path_norm == exe_norm:
             self.prefix = ""
-        elif path_norm.startswith(exe_norm + os.sep):
+        elif path_norm.startswith(exe_norm + path_sep):
             rel = path_norm[len(exe_norm) + 1 :]
-            rel = rel.replace(os.sep, "/")
+            rel = rel.replace(path_sep, "/")
             self.prefix = rel + "/" if rel and not rel.endswith("/") else rel
         else:
             raise ImportError("path is not related to executable")
