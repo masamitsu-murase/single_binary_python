@@ -906,10 +906,8 @@ class DocXMLRPCRequestHandler(SimpleXMLRPCRequestHandler):
     """
 
     def _get_css(self, url):
-        path_here = os.path.dirname(os.path.realpath(__file__))
-        css_path = os.path.join(path_here, "..", "pydoc_data", "_pydoc.css")
-        with open(css_path, mode="rb") as fp:
-            return fp.read()
+        import pkgutil
+        return pkgutil.get_data("pydoc_data", "_pydoc.css")
 
     def do_GET(self):
         """Handles the HTTP GET request.

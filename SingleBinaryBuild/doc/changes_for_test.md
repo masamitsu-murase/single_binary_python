@@ -56,82 +56,75 @@
 - B: _testcapi, _testinternalcapi など、_testxxxx というモジュールが存在しないことによるエラー
 - C: それ以外
 
+※本節は `SingleBinaryBuild/doc/test_fail_logs` の現行ログに合わせて更新。
+（`test_test_multiprocessing_spawn_test_misc.log` を含む）
+
 ### A のテスト
 
 - test.test_inspect.test_inspect  
-    `__spec__.cached` が `None`（`Cached:` が出ず、埋め込み loader になっている）
+    `__spec__.cached` が `None` で期待される `.pyc` パスが出ない
 - test_argparse  
-    `argparse.__file__` が `...\sbpython.exe\argparse.py` を指し `FileNotFoundError`、翻訳 msgid 取得も空
+    `argparse.__file__` が `...\sbpython.exe\argparse.py` を指し `FileNotFoundError`、翻訳検証も不一致
 - test_ast  
-    標準ライブラリ探索先が `...\sbpython.exe` になり `os.listdir()` が `NotADirectoryError`
+    標準ライブラリ探索先が `...\sbpython.exe` 扱いとなり `NotADirectoryError`
 - test_docxmlrpc  
-    `xmlrpc` が参照する `_pydoc.css` を `...\sbpython.exe\...` から開けず `FileNotFoundError`
+    `_pydoc.css` を `...\sbpython.exe\...` から読みに行き `FileNotFoundError`
 - test_getopt  
-    翻訳 msgid 取得結果が空（期待スナップショット不一致）
+    翻訳メッセージ取得結果が空で期待リスト不一致
 - test_linecache  
-    `linecache` が埋め込み側パスで期待どおりソース取得できず、空行/キャッシュ関連が不一致
+    埋め込みパス前提で `linecache` の取得/キャッシュ期待が崩れる
 - test_optparse  
-    翻訳 msgid 取得結果が空（期待スナップショット不一致）
-- test_pyrepl  
-    import 補完が部分一致止まり（モジュール列挙が不十分で `pathlib` などへ補完不能）
+    翻訳メッセージ取得結果が空で期待リスト不一致
+- test_re  
+    警告発生位置のファイル名が `embeddedimport_helper.py` となり期待値不一致
+- test_tabnanny  
+    usage に出るスクリプトパスが `Lib\tabnanny.py` ではなく `sbpython.exe\tabnanny.py`
 - test_urllib2  
-    `file://` で `urllib/request.py` 実ファイルを開こうとして `...\sbpython.exe\urllib\request.py` が見つからず失敗
+    `urllib/request.py` 実ファイル参照で `...\sbpython.exe\urllib\request.py` が見つからない
+- test_zoneinfo  
+    warning 発生位置のファイル名が `zoneinfo/__init__.py` 側となり期待値不一致
 
 ### B のテスト
 
-- test_atexit  
-    `_testcapi` 不在により期待 `MemoryError` ではなく `ModuleNotFoundError`
-- test_call  
-    `_testinternalcapi` が `None` 扱いで `AttributeError`
 - test_capi  
-    `_testcapi` が無くテストモジュール import 失敗
-- test_class  
-    `_testinternalcapi` が無くテストモジュール import 失敗
-- test_code  
-    `_testcapi` が無くテストモジュール import 失敗
-- test_interpreters  
-    `_testinternalcapi` が `None` で `get_code_var_counts` 呼び出し失敗
-- test_threading  
-    `_testcapi` 不在でサブプロセスが `ModuleNotFoundError`
-- test_traceback  
-    多数ケースが `_testcapi` 不在で `ModuleNotFoundError`
-- test_winconsoleio  
-    `_testconsole` 不在で import 失敗
+    `_testcapi` が無く import で失敗（現行ログでも FAIL 継続）
 
 ### C のテスト
 
-- test.test_multiprocessing_spawn.test_misc  
-    `sys.executable=None` で `embeddedimport_helper._to_os_path()` が `TypeError`、および `multiprocessing.__init__` 名称前提の不一致
+- test.test_multiprocessing_spawn.test_misc
+    `multiprocessing.__init__` をモジュール一覧から削除する前提が崩れ、`ValueError: list.remove(x): x not in list`
 - test_bdb  
     トレースイベント列不一致（期待 `line` に対し `call`）
 - test_builtin  
-    `__import__('string\x00')` で `embeddedimport_helper` 側が `SystemError` を返し、期待例外不一致
-- test_dtrace  
-    保存ログでは失敗せず（skip のみで PASS）
+    `__import__('string\x00')` で `SystemError` を返し期待例外不一致
 - test_external_inspection  
     `AsyncioDebug section unavailable`（外部検査情報が無い）
-- test_functools  
-    lazy import テストで `os` が起動時点で既に import 済み
 - test_getpath  
     `module_search_paths` に実行ファイルパスが混入し多数アサーション不一致
-- test_mimetypes  
-    lazy import テストで `os` が起動時点で既に import 済み
-- test_re  
-    警告発生位置 `w.filename` が `embeddedimport_helper.py` となり期待ファイルと不一致
 - test_regrtest  
     `PCbuild\amd64\python.exe` 前提のバッチ実行がパス不一致で失敗
-- test_shlex  
-    lazy import テストで `os` が起動時点で既に import 済み
-- test_struct  
-    保存ログでは失敗せず（skip 1 件のみで PASS）
 - test_sys  
-    `sys._stdlib_dir` が `None`（`TypeError`）が主因（JIT 側では `_testcapi` 不在も発生）
+    `sys._stdlib_dir` が `None` による `TypeError` が主因（JIT サブテストでは `_testcapi` 不在も併発）
 - test_sysconfig  
     venv 実行ファイル生成/起動失敗（`FileNotFoundError`）とライブラリ名期待不一致（`sbpython.exe` vs `python314.dll`）
-- test_tabnanny  
-    usage 表示のスクリプトパスが `Lib\tabnanny.py` 期待に対して `sbpython.exe\tabnanny.py`
-- test_zoneinfo  
-    warning 発生位置ファイル名が `zoneinfo/__init__.py` 側になり、期待テストファイルと不一致
+
+### 参考: 直近ログで SUCCESS 化したテスト
+
+以下は `test_fail_logs` 上で現在 PASS。
+
+- test_atexit
+- test_call
+- test_class
+- test_code
+- test_dtrace
+- test_functools
+- test_interpreters
+- test_mimetypes
+- test_shlex
+- test_struct
+- test_threading
+- test_traceback
+- test_winconsoleio
 
 ## B分類テストへの対応（_testxxxx）
 
@@ -167,3 +160,5 @@ test_capi を除き、個別に対応。
 補足:
 - `test_interpreters` は fail テスト内に `import _testxxxx` の記述がなく、
     `_testinternalcapi` は別モジュール経由で参照されているため、このルールでの直接挿入対象はなし。
+- 上記対応後、`test_atexit` / `test_threading` / `test_traceback` / `test_interpreters` は
+    現行ログで SUCCESS を確認。
