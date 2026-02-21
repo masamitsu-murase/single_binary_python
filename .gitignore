@@ -47,6 +47,7 @@ gmon.out
 .DS_Store
 
 *.exe
+!/SingleBinaryBuild/external_tools/*.exe
 
 # Ignore core dumps... but not Tools/msi/core/ or the like.
 core
