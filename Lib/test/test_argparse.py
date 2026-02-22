@@ -6029,7 +6029,8 @@ class TestEncoding(TestCase):
             f.read()
 
     def test_argparse_module_encoding(self):
-        self._test_module_encoding(argparse.__file__)
+        file = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'argparse.py'))
+        self._test_module_encoding(file)
 
     def test_test_argparse_module_encoding(self):
         self._test_module_encoding(__file__)
@@ -7116,7 +7117,16 @@ class TestProgName(TestCase):
 class TestTranslations(TestTranslationsBase):
 
     def test_translations(self):
-        self.assertMsgidsEqual(argparse)
+        class _Dummy:
+            @property
+            def __file__(self):
+                return os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'argparse.py'))
+
+            @property
+            def __name__(self):
+                return 'argparse'
+
+        self.assertMsgidsEqual(_Dummy())
 
 
 # ===========

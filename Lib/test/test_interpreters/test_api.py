@@ -1197,10 +1197,11 @@ class TestInterpreterCall(TestBase):
         self.assertEqual(code1.co_cellvars, code2.co_cellvars)
         self.assertEqual(code1.co_freevars, code2.co_freevars)
         self.assertEqual(code1.co_names, code2.co_names)
-        self.assertEqual(
-            _testinternalcapi.get_code_var_counts(code1),
-            _testinternalcapi.get_code_var_counts(code2),
-        )
+        if _testinternalcapi:
+            self.assertEqual(
+                _testinternalcapi.get_code_var_counts(code1),
+                _testinternalcapi.get_code_var_counts(code2),
+            )
         self.assertEqual(code1.co_code, code2.co_code)
 
     def assert_funcs_equal(self, func1, func2):
@@ -1212,10 +1213,11 @@ class TestInterpreterCall(TestBase):
         self.assertEqual(func1.__kwdefaults__, func2.__kwdefaults__)
         self.assertEqual(func1.__closure__, func2.__closure__)
         self.assert_code_equal(func1.__code__, func2.__code__)
-        self.assertEqual(
-            _testinternalcapi.get_code_var_counts(func1),
-            _testinternalcapi.get_code_var_counts(func2),
-        )
+        if _testinternalcapi:
+            self.assertEqual(
+                _testinternalcapi.get_code_var_counts(func1),
+                _testinternalcapi.get_code_var_counts(func2),
+            )
 
     def assert_exceptions_equal(self, exc1, exc2):
         assert isinstance(exc1, Exception)

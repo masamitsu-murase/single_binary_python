@@ -2,10 +2,14 @@
 import glob
 import os
 import os.path
+from pathlib import Path
 import string
 import subprocess
 import tokenize
 import compression.zstd as zstd
+
+THIS_DIR = Path(__file__).parent.resolve()
+EXTERNAL_TOOLS_DIR = THIS_DIR / "external_tools"
 
 
 def check_skip(filename):
@@ -27,10 +31,18 @@ def check_skip(filename):
 def get_file_data():
     file_list = []
 
-    all_filenames = [i.replace(os.path.sep, "/") for i in glob.glob("**/*.py", recursive=True)] + \
-        [i.replace(os.path.sep, "/") for i in glob.glob("lib2to3/*.pickle")] + \
-        glob.glob("certifi/cacert.pem") + \
-        [i.replace(os.path.sep, "/") for i in glob.glob("werkzeug/debug/shared/*.*")]
+    all_filenames = [
+        "email/architecture.rst",
+        "pydoc_data/_pydoc.css",
+        "tomllib/mypy.ini",
+        "turtledemo/turtle.cfg",
+        "_pyrepl/mypy.ini",
+    ] + list(glob.glob("**/*.py", recursive=True)) + \
+        list(glob.glob("lib2to3/*.pickle")) + \
+        list(glob.glob("certifi/cacert.pem")) + \
+        list(glob.glob("werkzeug/debug/shared/*.*"))
+    all_filenames = set(i.replace(os.path.sep, "/") for i in all_filenames)
+
     for filename in sorted(all_filenames):
         if check_skip(filename):
             continue
@@ -153,7 +165,7 @@ if __name__ == "__main__":
         # output_list(file_list)
         output_key_file_for_gperf(file_list)
         subprocess.run([
-            "gperf",
+            str(EXTERNAL_TOOLS_DIR / "gperf"),
             "-L", "ANSI-C",
             "-t",
             "-N", "embeddedimporter_find_entry",

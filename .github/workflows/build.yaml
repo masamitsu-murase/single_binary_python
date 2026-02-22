@@ -34,6 +34,11 @@ jobs:
       run: cmd /c SingleBinaryBuild\prepare_ssl.bat
     - name: Build tcl/tk
       run: cmd /c SingleBinaryBuild\prepare_tcltk.bat
+    - name: Generate embedded resources.
+      run: |
+        .\SingleBinaryBuild\external_tools\sbpython.exe SingleBinaryBuild/create_embeddedimporter_data.py
+        .\SingleBinaryBuild\external_tools\sbpython.exe SingleBinaryBuild/create_tcl_embeddedfilesystem_data.py externals/tcltk-8.6.15.0/amd64/lib Modules/_tkinter_tclEmbeddedFilesystemData.c
+      shell: pwsh
     - name: Build CPython
       run: cmd /c SingleBinaryBuild.bat
     - name: Prepare artifact
@@ -51,5 +56,5 @@ jobs:
     - name: Test
       run: |
         copy SingleBinaryBuild\amd64\python.exe .\sbpython.exe
-        .\sbpython.exe -m test.regrtest -x test_ctypes test_distutils test_ensurepip test_idle test_importlib test_lib2to3 test_pydoc test_ttk_textonly test_unittest test_readline test_threaded_import test_venv
+        .\sbpython.exe -m test.regrtest -x test_capi test_ensurepip test_idle test_pydoc test_venv
       shell: cmd

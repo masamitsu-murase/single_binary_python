@@ -465,7 +465,7 @@ class TestSysConfig(unittest.TestCase, VirtualEnvironmentMixin):
         major, minor = sys.version_info[:2]
         abiflags = sysconfig.get_config_var('ABIFLAGS')
         if sys.platform.startswith('win'):
-            self.assertEqual(library, f'python{major}{minor}{abiflags}.dll')
+            self.assertEqual(library, os.path.basename(sys.executable))
             self.assertEqual(library, ldlibrary)
         elif is_apple_mobile:
             framework = sysconfig.get_config_var('PYTHONFRAMEWORK')
@@ -654,6 +654,7 @@ class TestSysConfig(unittest.TestCase, VirtualEnvironmentMixin):
 
     @requires_subprocess()
     def test_makefile_overwrites_config_vars(self):
+        raise unittest.SkipTest("venv is not supported.")
         script = textwrap.dedent("""
             import sys, sysconfig
 

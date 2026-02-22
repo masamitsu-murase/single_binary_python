@@ -1041,6 +1041,7 @@ class TestErrorMessagesSuggestions(unittest.TestCase):
 @cpython_only
 class TestRecursion(unittest.TestCase):
 
+    @unittest.skipIf(_testinternalcapi is None, "requires _testinternalcapi")
     def test_margin_is_sufficient(self):
 
         def get_sp():

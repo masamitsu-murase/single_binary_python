@@ -1663,7 +1663,16 @@ class MiscTestCase(unittest.TestCase):
 
 class TestTranslations(TestTranslationsBase):
     def test_translations(self):
-        self.assertMsgidsEqual(optparse)
+        class _Dummy:
+            @property
+            def __file__(self):
+                return os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'optparse.py'))
+
+            @property
+            def __name__(self):
+                return 'optparse'
+
+        self.assertMsgidsEqual(_Dummy())
 
 
 if __name__ == '__main__':

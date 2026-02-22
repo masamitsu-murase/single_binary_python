@@ -233,7 +233,18 @@ def test_libref_examples():
 
 class TestTranslations(TestTranslationsBase):
     def test_translations(self):
-        self.assertMsgidsEqual(getopt)
+        import os.path
+
+        class _Dummy:
+            @property
+            def __file__(self):
+                return os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'getopt.py'))
+
+            @property
+            def __name__(self):
+                return 'getopt'
+
+        self.assertMsgidsEqual(_Dummy())
 
 
 def load_tests(loader, tests, pattern):

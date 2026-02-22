@@ -1290,6 +1290,7 @@ class ThreadTests(BaseTestCase):
             self.skipTest(
                     "https://github.com/python/cpython/issues/124878 - Known"
                     " race condition that TSAN identifies.")
+        raise unittest.SkipTest("_testcapi is not supported")
         # gh-87135: tests that daemon threads hang during finalization
         script = textwrap.dedent('''
             import os

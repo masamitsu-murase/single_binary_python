@@ -33,7 +33,7 @@ from test.test_ast.snippets import (
 )
 
 
-STDLIB = os.path.dirname(ast.__file__)
+STDLIB = os.path.normpath(os.path.join(os.path.dirname(ast.__file__), '..', 'Lib'))
 STDLIB_FILES = [fn for fn in os.listdir(STDLIB) if fn.endswith(".py")]
 STDLIB_FILES.extend(["test/test_grammar.py", "test/test_unpack_ex.py"])
 

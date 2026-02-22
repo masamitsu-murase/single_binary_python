@@ -327,7 +327,8 @@ class TestCommandLine(TestCase):
 
     def test_command_usage(self):
         """Should display usage on no arguments."""
-        path = findfile('tabnanny.py')
+        import sys
+        path = os.path.join(sys.executable, 'tabnanny.py')
         stderr = f"Usage: {path} [-v] file_or_directory ..."
         self.validate_cmd(stderr=stderr, expect_failure=True)
 

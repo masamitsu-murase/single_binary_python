@@ -11,13 +11,13 @@ from test.support import os_helper
 from test.support.script_helper import assert_python_ok
 
 
-FILENAME = linecache.__file__
+FILENAME = "linecache.py"
 NONEXISTENT_FILENAME = FILENAME + '.missing'
 INVALID_NAME = '!@$)(!@#_1'
 EMPTY = ''
 TEST_PATH = os.path.dirname(__file__)
 MODULES = "linecache abc".split()
-MODULE_PATH = os.path.dirname(FILENAME)
+FILE_MODULE_PATH = os.path.normpath(os.path.join(TEST_PATH, '..'))
 
 SOURCE_1 = '''
 " Docstring "
@@ -131,10 +131,10 @@ class LineCacheTests(unittest.TestCase):
 
         # Check module loading
         for entry in MODULES:
-            filename = os.path.join(MODULE_PATH, entry) + '.py'
+            filename = os.path.join(FILE_MODULE_PATH, entry) + '.py'
             with open(filename, encoding='utf-8') as file:
                 for index, line in enumerate(file):
-                    self.assertEqual(line, getline(filename, index + 1))
+                    self.assertEqual(line, getline(entry + ".py", index + 1))
 
         # Check that bogus data isn't returned (issue #1309567)
         empty = linecache.getlines('a/b/c/__init__.py')
@@ -150,7 +150,7 @@ class LineCacheTests(unittest.TestCase):
     def test_clearcache(self):
         cached = []
         for entry in MODULES:
-            filename = os.path.join(MODULE_PATH, entry) + '.py'
+            filename = entry + ".py"
             cached.append(filename)
             linecache.getline(filename, 1)
 
@@ -283,7 +283,7 @@ class LineCacheTests(unittest.TestCase):
 
     def test_frozen(self):
         filename = '<frozen fakemodule>'
-        module_globals = {'__file__': FILENAME}
+        module_globals = {'__file__': os.path.join(FILE_MODULE_PATH, 'linecache.py')}
         empty = linecache.getlines(filename)
         self.assertEqual(empty, [])
         lines = linecache.getlines(filename, module_globals)

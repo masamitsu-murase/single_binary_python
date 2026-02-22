@@ -6,11 +6,13 @@ embedded data exposed from the built-in 'embeddedimport' module.
 
 import _frozen_importlib_external as _bootstrap_external
 import _frozen_importlib as _bootstrap
-import os
 import sys
 
 
 _c = None
+_executable = sys.executable
+path_sep = _bootstrap_external.path_sep
+alt_path_sep = _bootstrap_external.path_separators[1:]
 
 
 def _load_c_extension():
@@ -36,11 +38,14 @@ def _to_module_path(fullname: str) -> str:
 
 
 def _normalize_path(path: str) -> str:
-    return os.path.normcase(os.path.normpath(path))
+    if alt_path_sep:
+        path = path.replace(alt_path_sep, path_sep)
+    return path
 
 
 def _to_os_path(executable: str, embedded_path: str) -> str:
-    return os.path.join(executable, embedded_path.replace("/", os.sep))
+    os_embedded_path = embedded_path.replace("/", path_sep)
+    return _bootstrap_external._path_join(executable, os_embedded_path)
 
 
 class EmbeddedImporter(_bootstrap_external._LoaderBasics):
@@ -52,7 +57,7 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
         if not isinstance(path, str):
             raise ImportError("expected str path")
 
-        exe = sys.executable
+        exe = _executable
         if not exe:
             raise ImportError("sys.executable is not set")
 
@@ -61,9 +66,9 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
 
         if path_norm == exe_norm:
             self.prefix = ""
-        elif path_norm.startswith(exe_norm + os.sep):
+        elif path_norm.startswith(exe_norm + path_sep):
             rel = path_norm[len(exe_norm) + 1 :]
-            rel = rel.replace(os.sep, "/")
+            rel = rel.replace(path_sep, "/")
             self.prefix = rel + "/" if rel and not rel.endswith("/") else rel
         else:
             raise ImportError("path is not related to executable")
@@ -101,7 +106,7 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
 
         # Namespace package (no source)
         spec = _bootstrap.ModuleSpec(name=fullname, loader=None, is_package=True)
-        path = _to_os_path(sys.executable, key)
+        path = _to_os_path(_executable, key)
         spec.submodule_search_locations.append(path)
         return spec
 
@@ -119,8 +124,11 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
         if module.__spec__.submodule_search_locations is not None:
             module.__path__ = list(module.__spec__.submodule_search_locations)
 
+        if not hasattr(module, '__builtins__'):
+            module.__builtins__ = __builtins__
+
         _bootstrap_external._fix_up_module(module.__dict__, fullname, module.__file__)
-        exec(code, module.__dict__)
+        _bootstrap._call_with_frames_removed(exec, code, module.__dict__)
 
     def get_code(self, fullname: str):
         info = self._find_entry(fullname)
@@ -129,7 +137,7 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
 
         key, is_package, use_resource, (offset, size) = info
         data = _c._get_data(offset, size, use_resource=use_resource)
-        pathname = _to_os_path(sys.executable, key)
+        pathname = _to_os_path(_executable, key)
         return _compile_source(pathname, data)
 
     def get_source(self, fullname: str):
@@ -150,14 +158,14 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
             raise ImportError(f"can't find module {fullname!r}")
 
         key, _, _, _ = info
-        return _to_os_path(sys.executable, key)
+        return _to_os_path(_executable, key)
 
     def get_data(self, pathname: str):
         if not isinstance(pathname, str):
             raise OSError(0, "", pathname)
 
         pathname = _normalize_path(pathname)
-        exe = sys.executable
+        exe = _executable
         if pathname.startswith(exe):
             rel = pathname[len(exe):].lstrip("\\/")
             rel = rel.replace("\\", "/")

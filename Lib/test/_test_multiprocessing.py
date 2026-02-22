@@ -5011,7 +5011,8 @@ class _TestImportStar(unittest.TestCase):
 
     def get_module_names(self):
         import glob
-        folder = os.path.dirname(multiprocessing.__file__)
+        test_dir = os.path.abspath(os.path.dirname(__file__))
+        folder = os.path.normpath(os.path.join(test_dir, '..', 'multiprocessing'))
         pattern = os.path.join(glob.escape(folder), '*.py')
         files = glob.glob(pattern)
         modules = [os.path.splitext(os.path.split(f)[1])[0] for f in files]

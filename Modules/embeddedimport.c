@@ -228,7 +228,7 @@ embeddedimport_find_entry(PyObject *self, PyObject *args)
     const char *filename;
 
     if (!PyArg_ParseTuple(args, "s", &filename)) {
-        Py_RETURN_NONE;
+        return NULL;
     }
 
     struct file_offset *entry = embeddedimporter_find_entry(filename, (unsigned int)strlen(filename));
@@ -245,7 +245,7 @@ embeddedimport_find_entry_in_resource(PyObject *self, PyObject *args)
     const char *filename;
 
     if (!PyArg_ParseTuple(args, "s", &filename)) {
-        Py_RETURN_NONE;
+        return NULL;
     }
 
     Py_RETURN_NONE;
