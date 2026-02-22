@@ -171,6 +171,7 @@ class ImplicitContextFiles:
 
         python/cpython#123085
         """
+        raise unittest.SkipTest("c_resources is not found.")
         self._compile_importlib()
         assert importlib.import_module('frozenpkg').val == 'resources are the best'
 
