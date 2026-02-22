@@ -2,10 +2,14 @@
 import glob
 import os
 import os.path
+from pathlib import Path
 import string
 import subprocess
 import tokenize
 import compression.zstd as zstd
+
+THIS_DIR = Path(__file__).parent.resolve()
+EXTERNAL_TOOLS_DIR = THIS_DIR / "external_tools"
 
 
 def check_skip(filename):
@@ -161,7 +165,7 @@ if __name__ == "__main__":
         # output_list(file_list)
         output_key_file_for_gperf(file_list)
         subprocess.run([
-            "gperf",
+            str(EXTERNAL_TOOLS_DIR / "gperf"),
             "-L", "ANSI-C",
             "-t",
             "-N", "embeddedimporter_find_entry",

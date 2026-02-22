@@ -22,6 +22,11 @@ jobs:
     - uses: actions/checkout@v4
       with:
         persist-credentials: false
+    - name: Generate embedded resources.
+      run: |
+        .\SingleBinaryBuild\external_tools\sbpython.exe SingleBinaryBuild/create_embeddedimporter_data.py
+        .\SingleBinaryBuild\external_tools\sbpython.exe SingleBinaryBuild/create_tcl_embeddedfilesystem_data.py externals/tcltk-8.6.15.0/amd64/lib Modules/_tkinter_tclEmbeddedFilesystemData.c
+      shell: pwsh
     - name: Get externals
       run: cmd /c SingleBinaryBuild\get_externals.bat --tkinter-src --openssl-src --libffi-src
     - name: Build libffi
