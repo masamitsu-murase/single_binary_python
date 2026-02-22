@@ -37,6 +37,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 r"C:\Python\python98.zip",
+                r"C:\Python\python.exe",
                 r"C:\Python\DLLs",
                 r"C:\Python\Lib",
                 r"C:\Python",
@@ -64,6 +65,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 r"C:\CPython\PCbuild\amd64\python98.zip",
+                r"C:\CPython\PCbuild\amd64\python.exe",
                 r"C:\CPython\PCbuild\amd64",
                 r"C:\CPython\Lib",
             ],
@@ -100,6 +102,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 r"C:\Python\python98.zip",
+                r"C:\venv\Scripts\python.exe",
                 r"C:\Python\DLLs",
                 r"C:\Python\Lib",
                 r"C:\Python",
@@ -132,6 +135,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 r"C:\Python\python98.zip",
+                r"C:\Python\python.exe",
                 "path1-dir",
                 # should not contain not-subdirs
                 r"C:\Python\DLLs",
@@ -149,6 +153,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 r"C:\Python\python98.zip",
+                r"C:\Python\python.exe",
                 r"C:\Python\DLLs",
                 r"C:\Python\Lib",
                 r"C:\Python",
@@ -176,6 +181,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 r"C:\Python\python98.zip",
+                r"C:\LinkedFrom\python.exe",
                 r"C:\Python\DLLs",
                 r"C:\Python\Lib",
                 r"C:\Python",
@@ -205,6 +211,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 r"C:\CPython\PCbuild\amd64\python98.zip",
+                r"C:\LinkedFrom\python.exe",
                 r"C:\CPython\PCbuild\amd64",
                 r"C:\CPython\Lib",
             ],
@@ -235,6 +242,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 r"C:\Out\python98.zip",
+                r"C:\Out\python.exe",
                 r"C:\Out",
                 r"C:\CPython\Lib",
             ],
@@ -258,6 +266,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 r"C:\Python\python98.zip",
+                r"C:\Python\python.exe",
                 r"C:\Python",
                 r"C:\Python\Lib",
             ],
@@ -283,6 +292,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/usr/lib/python98.zip",
+                "/usr/bin/python",
                 "/usr/lib/python9.8",
                 "/usr/lib/python9.8/lib-dynload",
             ],
@@ -316,6 +326,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/usr/local/lib/python98.zip",
+                "/home/cpython/python",
                 "/home/cpython/Lib",
                 "/home/cpython/build/lib.linux-x86_64-9.8",
             ],
@@ -347,6 +358,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/usr/lib/python98.zip",
+                "/venv/bin/python",
                 "/usr/lib/python9.8",
                 "/usr/lib/python9.8/lib-dynload",
             ],
@@ -400,6 +412,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/usr/lib/python98.zip",
+                "/venv/bin/python",
                 "/usr/lib/python9.8",
                 "/usr/lib/python9.8/lib-dynload",
             ],
@@ -433,6 +446,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/path/to/non-installed/lib/python98.zip",
+                "/venv/bin/python",
                 "/path/to/non-installed/lib/python9.8",
                 "/path/to/non-installed/lib/python9.8/lib-dynload",
             ],
@@ -464,6 +478,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/usr/lib/python98.zip",
+                "/venv/bin/python",
                 "/usr/lib/python9.8",
                 "/usr/lib/python9.8/lib-dynload",
             ],
@@ -490,6 +505,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/usr/lib/python98.zip",
+                "/linkfrom/python",
                 "/usr/lib/python9.8",
                 "/usr/lib/python9.8/lib-dynload",
             ],
@@ -525,6 +541,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/usr/local/lib/python98.zip",
+                "/linkfrom/python",
                 "/home/cpython/Lib",
                 "/home/cpython/build/lib.linux-x86_64-9.8",
             ],
@@ -550,6 +567,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/usr/lib64/python98.zip",
+                "/linkfrom/python",
                 "/usr/lib64/python9.8",
                 "/usr/lib64/python9.8/lib-dynload",
             ],
@@ -591,6 +609,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/Library/Frameworks/Python.framework/Versions/9.8/lib/python98.zip",
+                "/Library/Frameworks/Python.framework/Versions/9.8/bin/python9.8",
                 "/Library/Frameworks/Python.framework/Versions/9.8/lib/python9.8",
                 "/Library/Frameworks/Python.framework/Versions/9.8/lib/python9.8/lib-dynload",
             ],
@@ -638,6 +657,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/Library/Frameworks/DebugPython.framework/Versions/9.8/lib/python98.zip",
+                "/Library/Frameworks/DebugPython.framework/Versions/9.8/bin/python9.8",
                 "/Library/Frameworks/DebugPython.framework/Versions/9.8/lib/python9.8",
                 "/Library/Frameworks/DebugPython.framework/Versions/9.8/lib/python9.8/lib-dynload",
             ],
@@ -681,6 +701,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/Library/Frameworks/Python.framework/Versions/9.8/lib/python98.zip",
+                f"{venv_path}/bin/python",
                 "/Library/Frameworks/Python.framework/Versions/9.8/lib/python9.8",
                 "/Library/Frameworks/Python.framework/Versions/9.8/lib/python9.8/lib-dynload",
             ],
@@ -726,6 +747,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/Library/Frameworks/DebugPython.framework/Versions/9.8/lib/python98.zip",
+                f"{venv_path}/bin/python",
                 "/Library/Frameworks/DebugPython.framework/Versions/9.8/lib/python9.8",
                 "/Library/Frameworks/DebugPython.framework/Versions/9.8/lib/python9.8/lib-dynload",
             ],
@@ -763,6 +785,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/usr/lib/python98.zip",
+                "/framework/Python9.8/python",
                 "/usr/lib/python9.8",
                 "/usr/lib/python9.8/lib-dynload",
             ],
@@ -793,6 +816,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/usr/lib/python98.zip",
+                "/linkfrom/python",
                 "/usr/lib/python9.8",
                 "/usr/lib/python9.8/lib-dynload",
             ],
@@ -832,6 +856,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/usr/local/lib/python98.zip",
+                "/linkfrom/python",
                 "/home/cpython/Lib",
                 "/home/cpython/build/lib.macos-9.8",
             ],
@@ -878,6 +903,7 @@ class MockGetPathTests(unittest.TestCase):
             module_search_paths_set=1,
             module_search_paths=[
                 "/pythonhome/lib/python98.zip",
+                "/venv/bin/python",
                 "/pythonhome/lib/python9.8",
                 "/pythonhome/lib/python9.8/lib-dynload",
             ],

@@ -797,6 +797,24 @@ error:
  * ASYNCIO DEBUG FUNCTIONS
  * ============================================================================ */
 
+#ifdef MS_WINDOWS
+static const wchar_t *
+get_program_basename_w(void)
+{
+    const wchar_t *program = Py_GetProgramName();
+    if (program == NULL || *program == L'\0') {
+        return NULL;
+    }
+
+    const wchar_t *base = wcsrchr(program, L'\\');
+    const wchar_t *alt = wcsrchr(program, L'/');
+    if (alt != NULL && (base == NULL || alt > base)) {
+        base = alt;
+    }
+    return base != NULL ? base + 1 : program;
+}
+#endif
+
 // Get the PyAsyncioDebug section address for any platform
 static uintptr_t
 _Py_RemoteDebug_GetAsyncioDebugAddress(proc_handle_t* handle)
@@ -807,7 +825,13 @@ _Py_RemoteDebug_GetAsyncioDebugAddress(proc_handle_t* handle)
     // On Windows, search for asyncio debug in executable or DLL
     address = search_windows_map_for_section(handle, "AsyncioD", L"_asyncio");
     if (address == 0) {
-        // Error out: 'python' substring covers both executable and DLL
+        PyErr_Clear();
+        const wchar_t *program = get_program_basename_w();
+        if (program != NULL && *program != L'\0') {
+            address = search_windows_map_for_section(handle, "AsyncioD", program);
+        }
+    }
+    if (address == 0) {
         PyObject *exc = PyErr_GetRaisedException();
         PyErr_SetString(PyExc_RuntimeError, "Failed to find the AsyncioDebug section in the process.");
         _PyErr_ChainExceptions1(exc);
@@ -816,7 +840,6 @@ _Py_RemoteDebug_GetAsyncioDebugAddress(proc_handle_t* handle)
     // On Linux, search for asyncio debug in executable or DLL
     address = search_linux_map_for_section(handle, "AsyncioDebug", "_asyncio.cpython");
     if (address == 0) {
-        // Error out: 'python' substring covers both executable and DLL
         PyObject *exc = PyErr_GetRaisedException();
         PyErr_SetString(PyExc_RuntimeError, "Failed to find the AsyncioDebug section in the process.");
         _PyErr_ChainExceptions1(exc);
@@ -829,7 +852,6 @@ _Py_RemoteDebug_GetAsyncioDebugAddress(proc_handle_t* handle)
         address = search_map_for_section(handle, "AsyncioDebug", "_asyncio.cpython");
     }
     if (address == 0) {
-        // Error out: 'python' substring covers both executable and DLL
         PyObject *exc = PyErr_GetRaisedException();
         PyErr_SetString(PyExc_RuntimeError, "Failed to find the AsyncioDebug section in the process.");
         _PyErr_ChainExceptions1(exc);

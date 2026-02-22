@@ -124,8 +124,11 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
         if module.__spec__.submodule_search_locations is not None:
             module.__path__ = list(module.__spec__.submodule_search_locations)
 
+        if not hasattr(module, '__builtins__'):
+            module.__builtins__ = __builtins__
+
         _bootstrap_external._fix_up_module(module.__dict__, fullname, module.__file__)
-        exec(code, module.__dict__)
+        _bootstrap._call_with_frames_removed(exec, code, module.__dict__)
 
     def get_code(self, fullname: str):
         info = self._find_entry(fullname)
