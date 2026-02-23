@@ -226,12 +226,17 @@ static PyObject *
 embeddedimport_find_entry(PyObject *self, PyObject *args)
 {
     const char *filename;
+    Py_ssize_t filename_len;
 
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
+    if (!PyArg_ParseTuple(args, "s#", &filename, &filename_len)) {
         return NULL;
     }
 
-    struct file_offset *entry = embeddedimporter_find_entry(filename, (unsigned int)strlen(filename));
+    if (memchr(filename, '\0', (size_t)filename_len) != NULL) {
+        Py_RETURN_NONE;
+    }
+
+    struct file_offset *entry = embeddedimporter_find_entry(filename, (unsigned int)filename_len);
     if (entry == NULL) {
         Py_RETURN_NONE;
     }
@@ -243,9 +248,14 @@ static PyObject *
 embeddedimport_find_entry_in_resource(PyObject *self, PyObject *args)
 {
     const char *filename;
+    Py_ssize_t filename_len;
 
-    if (!PyArg_ParseTuple(args, "s", &filename)) {
+    if (!PyArg_ParseTuple(args, "s#", &filename, &filename_len)) {
         return NULL;
+    }
+
+    if (memchr(filename, '\0', (size_t)filename_len) != NULL) {
+        Py_RETURN_NONE;
     }
 
     Py_RETURN_NONE;
