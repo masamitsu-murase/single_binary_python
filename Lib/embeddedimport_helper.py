@@ -113,22 +113,10 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
     def create_module(self, spec):
         return None
 
-    def exec_module(self, module):
-        fullname = module.__spec__.name
-        code = self.get_code(fullname)
-        if code is None:
-            raise ImportError(f"module {fullname!r} has no code")
-
-        module.__loader__ = self
-        module.__file__ = self.get_filename(fullname)
-        if module.__spec__.submodule_search_locations is not None:
-            module.__path__ = list(module.__spec__.submodule_search_locations)
-
-        if not hasattr(module, '__builtins__'):
-            module.__builtins__ = __builtins__
-
-        _bootstrap_external._fix_up_module(module.__dict__, fullname, module.__file__)
-        _bootstrap._call_with_frames_removed(exec, code, module.__dict__)
+    # Delegate execution to importlib's internal implementation so warning
+    # stacklevel attribution matches standard loaders.
+    # def exec_module(self, module):
+    #     return _bootstrap_external._LoaderBasics.exec_module(self, module)
 
     def get_code(self, fullname: str):
         info = self._find_entry(fullname)
