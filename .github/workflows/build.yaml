@@ -60,8 +60,9 @@ jobs:
         $ErrorActionPreference = 'Stop'
         copy SingleBinaryBuild\amd64\python.exe .\sbpython.exe
         .\sbpython.exe -m test.regrtest -x test_capi test_dtrace test_ensurepip test_idle test_interpreters test_pydoc test_venv
+      shell: pwsh
     - name: Test test_interpreters
       run: |
         $ErrorActionPreference = 'Stop'
         .\sbpython.exe -m test.regrtest test_interpreters
-      shell: cmd
+      shell: pwsh
