@@ -12,8 +12,7 @@
 // current versions of Windows.
 1 RT_MANIFEST "python.manifest"
 
-1 ICON DISCARDABLE "icons\python.ico" 
-tk ICON DISCARDABLE "..\\externals\\tk-8.6.15.0\\win\\rc\\tk.ico"
+tk ICON DISCARDABLE "icons\python.ico" 
 
 
 /////////////////////////////////////////////////////////////////////////////
