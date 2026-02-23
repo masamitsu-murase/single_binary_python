@@ -155,7 +155,7 @@ class CmdLineTest(unittest.TestCase):
     def test_xoption_frozen_modules(self):
         tests = {
             ('=on', 'FrozenImporter'),
-            ('=off', 'SourceFileLoader'),
+            ('=off', 'EmbeddedImporter'),
             ('=', 'FrozenImporter'),
             ('', 'FrozenImporter'),
         }
@@ -170,7 +170,7 @@ class CmdLineTest(unittest.TestCase):
     def test_env_var_frozen_modules(self):
         tests = {
             ('on', 'FrozenImporter'),
-            ('off', 'SourceFileLoader'),
+            ('off', 'EmbeddedImporter'),
         }
         for raw, expected in tests:
             cmd = ['-c', 'import os; print(os.__spec__.loader, end="")']

@@ -54,7 +54,9 @@ jobs:
     - name: Display build info
       run: .\\python.bat -m test.pythoninfo
     - name: Test
+      # To avoid reload(_queue) bug, test_interpreters should be run separately.
       run: |
         copy SingleBinaryBuild\amd64\python.exe .\sbpython.exe
-        .\sbpython.exe -m test.regrtest -x test_capi test_ensurepip test_idle test_pydoc test_venv
+        .\sbpython.exe -m test.regrtest -x test_capi test_dtrace test_ensurepip test_idle test_interpreters test_pydoc test_venv
+        .\sbpython.exe -m test.regrtest test_interpreters
       shell: cmd

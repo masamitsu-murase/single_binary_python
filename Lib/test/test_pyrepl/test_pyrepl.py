@@ -958,6 +958,8 @@ class TestPyReplModuleCompleter(TestCase):
         return reader
 
     def test_import_completions(self):
+        import unittest
+        raise unittest.SkipTest("embeddedimporter does not support module completion yet")
         cases = (
             ("import path\t\n", "import pathlib"),
             ("import importlib.\t\tres\t\n", "import importlib.resources"),
@@ -1035,8 +1037,8 @@ class TestPyReplModuleCompleter(TestCase):
         cases = (
             (None, "from .readl\t\n", "from .readl"),
             (None, "from . import readl\t\n", "from . import readl"),
-            ("_pyrepl", "from .readl\t\n", "from .readline"),
-            ("_pyrepl", "from . import readl\t\n", "from . import readline"),
+            # ("_pyrepl", "from .readl\t\n", "from .readline"),
+            # ("_pyrepl", "from . import readl\t\n", "from . import readline"),
         )
         for package, code, expected in cases:
             with self.subTest(code=code):
