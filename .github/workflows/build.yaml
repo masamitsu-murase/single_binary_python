@@ -53,12 +53,15 @@ jobs:
         name: python
         path: artifact/*.exe
     - name: Display build info
-      run: .\\python.bat -m test.pythoninfo
+      run: ".\\python.bat -m test.pythoninfo"
     - name: Test
       # To avoid reload(_queue) bug, test_interpreters should be run separately.
       run: |
         $ErrorActionPreference = 'Stop'
         copy SingleBinaryBuild\amd64\python.exe .\sbpython.exe
         .\sbpython.exe -m test.regrtest -v -x test_capi test_dtrace test_ensurepip test_idle test_interpreters test_pydoc test_venv
+    - name: Test test_interpreters
+      run: |
+        $ErrorActionPreference = 'Stop'
         .\sbpython.exe -m test.regrtest test_interpreters
       shell: cmd
