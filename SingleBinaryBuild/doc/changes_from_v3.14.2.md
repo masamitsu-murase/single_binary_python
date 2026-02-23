@@ -24,18 +24,18 @@
 ## 調査対象と規模
 
 - 比較範囲: `v3.14.2..HEAD`
-- コミット数: 74
-- 変更ファイル数: 201
-- 差分行数: `285,689 insertions`, `8 deletions`
+- コミット数: 95
+- 変更ファイル数: 233
+- 差分行数: `286,576 insertions`, `68 deletions`
 
 ディレクトリ単位の傾向（ファイル数ベース）:
 
-- `SingleBinaryBuild/`: 86.6%
-- `Modules/`: 4.8%
-- `PC/`: 2.4%
-- `SingleBinaryBuild/doc/`: 1.8%
-- `Python/`: 1.2%
-- その他（`Include/`, `Lib/`, `.github/workflows/`）: 少量
+- `SingleBinaryBuild/`: 64.4%（150 files）
+- `.github_org/`: 15.5%（36 files）
+- `Lib/`: 11.6%（27 files）
+- `Modules/`: 3.9%（9 files）
+- `PC/`: 1.7%（4 files）
+- その他（`Include/`, `Python/`, `Tools/`, `.github/`, ルート）: 少量
 
 ---
 
@@ -118,7 +118,7 @@ DLL 分離前提ではなく、**実行ファイルへ集約する前提**で初
 
 ### 変更概要
 
-`SingleBinaryBuild/` 配下で大規模に更新（146 ファイル変更）。特に以下が中核です。
+`SingleBinaryBuild/` 配下で大規模に更新（150 ファイル変更）。特に以下が中核です。
 
 - `.vcxproj` / `.filters` の広範な更新
 - `pythoncore.vcxproj`, `python.vcxproj`, `pythonw.vcxproj` の静的リンク前提調整

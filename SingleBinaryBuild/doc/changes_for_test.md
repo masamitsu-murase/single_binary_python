@@ -1,119 +1,84 @@
-# テストに対する変更
+# テストに対する変更（v3.14.2 → HEAD）
 
-## 概要
+`C:\my_program\git\bin\git.exe` で `v3.14.2..HEAD` の差分を確認し、**テストコードそのものを修正している箇所のみ**を整理する。
 
-主に embeddedimport があるために、テストコードの変更が必要になっている。  
-ここではその内容についてまとめる。
+## 1. embeddedimport / 単一バイナリ構成に合わせた参照先修正
 
-## もともとの Fail テスト
+- `Lib/test/_test_multiprocessing.py`  
+    `multiprocessing.__file__` 依存をやめ、`Lib/multiprocessing` をテストファイル基準で直接参照するよう変更。
 
-```text
-55 tests skipped:
-    test.test_asyncio.test_unix_events test.test_gdb.test_backtrace
-    test.test_gdb.test_cfunction test.test_gdb.test_cfunction_full
-    test.test_gdb.test_misc test.test_gdb.test_pretty_print
-    test.test_multiprocessing_fork.test_manager
-    test.test_multiprocessing_fork.test_misc
-    test.test_multiprocessing_fork.test_processes
-    test.test_multiprocessing_fork.test_threads
-    test.test_multiprocessing_forkserver.test_manager
-    test.test_multiprocessing_forkserver.test_misc
-    test.test_multiprocessing_forkserver.test_processes
-    test.test_multiprocessing_forkserver.test_threads test_android
-    test_apple test_bigmem test_bytes test_compileall test_crossinterp
-    test_dbm_gnu test_dbm_ndbm test_devpoll test_epoll test_fcntl
-    test_fileutils test_fork1 test_free_threading test_grp test_import
-    test_ioctl test_kqueue test_monitoring test_opcache test_openpty
-    test_optimizer test_perf_profiler test_perfmaps test_pkgutil
-    test_poll test_pty test_pwd test_pyclbr test_resource
-    test_stable_abi_ctypes test_syslog test_termios
-    test_thread_local_bytecode test_threadsignals test_tty
-    test_type_cache test_wait3 test_wait4 test_xxlimited
-    test_xxtestfuzz
+- `Lib/test/test_argparse.py`  
+    `argparse.__file__` の直接参照をやめ、`Lib/argparse.py` のパスを明示。翻訳テストはダミーオブジェクト（`__file__`, `__name__`）を使って検証するよう変更。
 
-10 tests skipped (resource denied):
-    test_curses test_peg_generator test_smtpnet test_socketserver
-    test_tkinter test_ttk test_urllib2net test_urllibnet test_winsound
-    test_zipfile64
+- `Lib/test/test_getopt.py`  
+    翻訳テストでモジュール実体ではなく、`Lib/getopt.py` を指すダミーオブジェクトを利用するよう変更。
 
-34 tests failed:
-    test.test_inspect.test_inspect
-    test.test_multiprocessing_spawn.test_misc test_argparse test_ast
-    test_atexit test_bdb test_builtin test_call test_capi test_class
-    test_code test_docxmlrpc test_dtrace test_external_inspection
-    test_functools test_getopt test_getpath test_interpreters
-    test_linecache test_mimetypes test_optparse test_pyrepl test_re
-    test_regrtest test_shlex test_struct test_sys test_sysconfig
-    test_tabnanny test_threading test_traceback test_urllib2
-    test_winconsoleio test_zoneinfo
-```
+- `Lib/test/test_optparse.py`  
+    翻訳テストでモジュール実体ではなく、`Lib/optparse.py` を指すダミーオブジェクトを利用するよう変更。
 
-## ログ精査結果（要因分類）
+- `Lib/test/test_ast/test_ast.py`  
+    `ast.__file__` の配置前提を外し、標準ライブラリ探索ルートを `.../Lib` 基準に修正。
 
-分類は以下の3種類で記載する。
+- `Lib/test/test_linecache.py`  
+    `linecache.__file__` 依存を外し、`linecache.py` を相対的に扱う形へ変更。`getline()` 検証も埋め込みインポータ向けの呼び方へ調整。
 
-- A: embeddedimport により、物理的なファイルにアクセスできなくなっている
-- B: _testcapi, _testinternalcapi など、_testxxxx というモジュールが存在しないことによるエラー
-- C: それ以外
+- `Lib/test/test_urllib2.py`  
+    `urllib.request.__file__` ではなく、テストファイル自身のパスを使うよう変更。
 
-※本節は `SingleBinaryBuild/doc/test_fail_logs` の現行ログに合わせて更新。
-（`test_test_multiprocessing_spawn_test_misc.log` を含む）
+- `Lib/test/test_tabnanny.py`  
+    使用説明メッセージで使うスクリプトパス算出方法を変更（`findfile('tabnanny.py')` 依存を外す方向）。
 
-### A のテスト
+- `Lib/test/test_cmd_line.py`  
+    `-X frozen_modules=off` の期待ローダー名を `SourceFileLoader` から `EmbeddedImporter` に変更。
 
-### C のテスト
+- `Lib/test/test_bdb.py`  
+    トレース除外対象に `embeddedimport_helper*` を追加。
 
-### 参考: 直近ログで SUCCESS 化したテスト
+- `Lib/test/test_getpath.py`  
+    `module_search_paths` の期待値に実行バイナリパス（`python.exe` / `.../bin/python`）を追加し、新しいパス解決仕様に合わせた。
 
-以下は `test_fail_logs` 上で現在 PASS。
+- `Lib/test/test_regrtest.py`  
+    Windows 向け `rt.bat` 参照先を `PCbuild\rt.bat` から `SingleBinaryBuild\rt.bat` に変更。
 
-- test_atexit
-- test_call
-- test_class
-- test_code
-- test_dtrace
-- test_functools
-- test_interpreters
-- test_mimetypes
-- test_shlex
-- test_struct
-- test_threading
-- test_traceback
-- test_winconsoleio
+## 2. 利用不可なテスト用 C 拡張・機能への対処（skip / 条件化）
 
-## B分類テストへの対応（_testxxxx）
+- `Lib/test/test_atexit.py`  
+    低メモリ系の `_testcapi` 依存テストを `SkipTest`。
 
-### グローバルスコープで `import _testxxxx` を行っているもの
+- `Lib/test/test_call.py`  
+    `_testinternalcapi` がない環境では再帰マージン検証テストを skip。
 
-test_capi を除き、個別に対応。
+- `Lib/test/test_class.py`  
+    `_testinternalcapi.has_inline_values` の import を例外処理化し、未提供時は関連アサートを条件付きで実行。
 
-- `test_capi`
-    - `Lib/test/test_capi/*`（複数ファイル）
-    - 例: `import _testcapi`, `import _testinternalcapi`, `import _testlimitedcapi`
-- `test_code`
-    - `Lib/test/test_code.py`
-    - `from _testcapi import code_offset_to_line`
-- `test_winconsoleio`
-    - `Lib/test/test_winconsoleio.py`
-    - `from _testconsole import write_input`
+- `Lib/test/test_code.py`  
+    `_testcapi.code_offset_to_line` の import を例外処理化し、未提供時は該当テストを skip。
 
-### それ以外（fail テスト側に SkipTest を追加）
+- `Lib/test/test_interpreters/test_api.py`  
+    `_testinternalcapi.get_code_var_counts()` 比較を、利用可能時のみ実施する条件付きに変更。
 
-以下は、fail していたテスト内で `_testxxxx` 依存を回避するため、
-`raise unittest.SkipTest("_testxxxx is not supported")` を追加した。
+- `Lib/test/test_winconsoleio.py`  
+    `_testconsole.write_input` の import を例外処理化（モジュール未提供時に備える）。
 
-- `test_atexit`
-    - `Lib/test/test_atexit.py`
-    - `test_atexit_with_low_memory` の先頭に追加
-- `test_threading`
-    - `Lib/test/test_threading.py`
-    - `test_finalize_daemon_thread_hang` の先頭に追加
-- `test_traceback`
-    - `Lib/test/test_traceback.py`
-    - 失敗系で `_testcapi` を import する箇所（`get_report()` / `check_traceback_format()` / `test_unhashable()` など）に追加
+- `Lib/test/test_traceback.py`  
+    `_testcapi` 依存の例外表示テスト群に `SkipTest` を追加。
 
-補足:
-- `test_interpreters` は fail テスト内に `import _testxxxx` の記述がなく、
-    `_testinternalcapi` は別モジュール経由で参照されているため、このルールでの直接挿入対象はなし。
-- 上記対応後、`test_atexit` / `test_threading` / `test_traceback` / `test_interpreters` は
-    現行ログで SUCCESS を確認。
+- `Lib/test/test_threading.py`  
+    `_testcapi` 依存の finalize 系テストを `SkipTest`。
+
+- `Lib/test/test_sys.py`  
+    `_stdlib_dir` 前提テストおよび `_testcapi` 前提の JIT テストを `SkipTest`。
+
+- `Lib/test/test_importlib/resources/test_files.py`  
+    `c_resources` が必要なケースを `SkipTest`。
+
+- `Lib/test/test_sysconfig.py`  
+    Windows での `LIBRARY` 期待値を DLL 名固定から `os.path.basename(sys.executable)` へ変更。加えて venv 前提テストを `SkipTest`。
+
+## 3. その他のテスト安定化調整
+
+- `Lib/test/test_inspect/test_inspect.py`  
+    `__spec__.cached` / `__cached__` の出力確認アサートを無効化。
+
+- `Lib/test/test_pyrepl/test_pyrepl.py`  
+    import completion 系を `SkipTest` とし、一部相対 import completion ケースをコメントアウト。

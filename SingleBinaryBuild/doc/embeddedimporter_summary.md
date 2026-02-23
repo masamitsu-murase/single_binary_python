@@ -7,7 +7,7 @@ EmbeddedImporter は、Python の標準ライブラリや外部ライブラリ�
 ### 主な特徴
 
 - **単一バイナリ化**: `Lib/` 配下のすべてのライブラリソースを実行ファイルに埋め込む
-- **zstd 圧縮**: ファイルデータを zstd 最高レベルで圧縮して埋め込む（約 9.4 MB → 約 1.6 MB）
+- **zstd 圧縮**: ファイルデータを zstd 最高レベルで圧縮して埋め込む
 - **gperf 完全ハッシュ**: ファイル名から O(1) でオフセット/サイズを検索
 - **PEP 489 マルチフェーズ初期化**: サブインタプリタ対応（`Py_mod_multiple_interpreters`）
 - **PEP 451 準拠**: `find_spec` / `create_module` / `exec_module` による path-hook 型インポーター
@@ -212,7 +212,7 @@ static unsigned char *embedded_raw_data = NULL;
 path-hook として `sys.path_hooks` から呼ばれます。
 
 1. `embeddedimport` C モジュールを遅延ロード（`_load_c_extension()`）
-2. `path` を `sys.executable` と比較（`os.path.normcase` + `os.path.normpath` で正規化）
+2. `path` を `sys.executable` と比較（区切り文字を実行環境の形式に正規化）
 3. 一致: `self.prefix = ""`（ルートインポーター）
 4. サブパス: `self.prefix = "relative/path/"` を算出
 5. 不一致: `ImportError` を送出（他の path-hook に委譲）
@@ -228,10 +228,8 @@ path-hook として `sys.path_hooks` から呼ばれます。
 
 #### `exec_module(self, module)`
 
-1. `get_code()` でコードオブジェクトを取得
-2. `__loader__`, `__file__`, `__path__` を設定
-3. `_bootstrap_external._fix_up_module()` を呼び出し
-4. `exec(code, module.__dict__)` でモジュールを実行
+`EmbeddedImporter` 自身は `exec_module()` をオーバーライドしていません。  
+`_LoaderBasics` 側の標準実装が利用され、`get_code()` / `get_filename()` / `get_data()` の実装を通じてモジュール実行が行われます。
 
 #### `create_module(self, spec)`
 
@@ -265,8 +263,8 @@ path-hook として `sys.path_hooks` から呼ばれます。
 | `_normalize_line_endings(source)` | `\r\n` / `\r` を `\n` に統一 |
 | `_compile_source(pathname, source)` | 改行統一後に `compile()` を実行 |
 | `_to_module_path(fullname)` | `"."` → `"/"` 変換 |
-| `_normalize_path(path)` | `os.path.normcase(os.path.normpath(path))` |
-| `_to_os_path(executable, embedded_path)` | `os.path.join(exe, path)` で OS パス構築 |
+| `_normalize_path(path)` | 区切り文字を実行環境の `path_sep` へ寄せる |
+| `_to_os_path(executable, embedded_path)` | `_path_join(executable, embedded_path)` で OS パス構築 |
 
 ---
 

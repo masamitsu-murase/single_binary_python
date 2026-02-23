@@ -31,8 +31,7 @@ SingleBinaryBuild.bat
 内部では以下が実行されます：
 
 ```bat
-set PYTHON=C:\...\python.exe   # ビルドツール用の既存 Python
-call SingleBinaryBuild\build.bat -c Release -p x64 -t Build --no-tkinter
+call SingleBinaryBuild\build.bat -c Release -p x64 -t Build
 ```
 
 `build.bat` は MSBuild を呼び出して `pcbuild.sln` をビルドします。`build.bat` 自体は `PCbuild/build.bat` のフォークであり、出力先が `SingleBinaryBuild\amd64\` に変更されています。
@@ -64,11 +63,11 @@ SingleBinaryBuild\amd64\
 | CRT リンク方式 | `pyproject.props` | `/MD`（動的 CRT）→ `/MT`（静的 CRT） |
 | インタプリタコア | `pythoncore.vcxproj` | DLL → StaticLibrary、EmbeddedImporter 追加 |
 | 実行ファイル | `python.vcxproj` | 全静的モジュールをリンク |
-| 拡張モジュール（24 個） | 各 `.vcxproj` | DLL → StaticLibrary（`pymodule_static.props` 経由） |
+| 拡張モジュール（23 個） | 各 `.vcxproj` | DLL → StaticLibrary（`pymodule_static.props` 経由） |
 | OpenSSL | `openssl.props` | DLL コピー無効化 |
 | libffi | `libffi.props` | `libffi-8.lib`（DLL）→ `libffi_convenience.lib`（静的） |
 | ビルド出力パス | `python.props` | `PCbuild\` → `SingleBinaryBuild\` |
-| 新規ファイル群 | 11 ファイル | Props、自動化スクリプト、EmbeddedImporter |
+| 新規ファイル群 | 多数 | Props、自動化スクリプト、EmbeddedImporter、静的モジュール用 vcxproj 群 |
 
 ### 1. pyproject.props — CRT リンク方式
 
@@ -103,7 +102,7 @@ SingleBinaryBuild\amd64\
 |---|---|---|
 | 追加 Props | — | `python_modules_link.props` |
 | プリプロセッサ（追加） | — | `Py_BUILD_CORE_BUILTIN;Py_SINGLE_BINARY_BUILD` |
-| リンク依存 | `pythoncore` のみ | `pythoncore` + 24 個の静的モジュール + すべてのシステムライブラリ |
+| リンク依存 | `pythoncore` のみ | `pythoncore` + 23 個の静的拡張モジュール + 外部/システムライブラリ |
 
 `python_modules_link.props` には、すべての静的モジュール（`*_builtin.lib`）、外部ライブラリ（`libffi_convenience.lib`、`libcrypto.lib`、`libssl.lib`）、および必要なシステムライブラリ（`ws2_32.lib`、`crypt32.lib`、`bcrypt.lib` 等）が列挙されています。
 
@@ -118,9 +117,11 @@ SingleBinaryBuild\amd64\
 | `TargetName` | `<projectname>` | `<projectname>_builtin` |
 | プリプロセッサ | — | `Py_BUILD_CORE_BUILTIN;Py_SINGLE_BINARY_BUILD;Py_NO_ENABLE_SHARED` |
 
-**静的リンク対象の全 24 モジュール**:
+**静的リンク対象の全 23 拡張モジュール**:
 
-`_asyncio`, `_bz2`, `_ctypes`, `_decimal`, `_elementtree`, `_hashlib`, `_lzma`, `_multiprocessing`, `_overlapped`, `_queue`, `_remote_debugging`, `_socket`, `_sqlite3`, `_ssl`, `_uuid`, `_wmi`, `_zoneinfo`, `_zstd`, `pyexpat`, `select`, `unicodedata`, `winsound`, `zlib-ng`, `sqlite3`
+`_asyncio`, `_bz2`, `_ctypes`, `_decimal`, `_elementtree`, `_hashlib`, `_lzma`, `_multiprocessing`, `_overlapped`, `_queue`, `_remote_debugging`, `_socket`, `_sqlite3`, `_ssl`, `_tkinter`, `_uuid`, `_wmi`, `_zoneinfo`, `_zstd`, `pyexpat`, `select`, `unicodedata`, `winsound`
+
+`zlib-ng` や `sqlite3` は外部/サポートライブラリとしてリンクされ、上記の「拡張モジュール数」には含めない。
 
 一部のモジュールには追加の変更があります：
 
@@ -148,13 +149,10 @@ SingleBinaryBuild\amd64\
 | `AdditionalDependencies` | `libffi-8.lib`（DLL インポートライブラリ） | `libffi_convenience.lib`（静的ライブラリ） |
 | `_CopyLIBFFIDLL` | DLL をコピー | コメントアウト |
 
-### 8. 変更なしのファイル
+### 8. 備考
 
-以下のファイルは PCbuild と SingleBinaryBuild で同一です：
-
-- `pcbuild.sln` — プロジェクト一覧は同一（各 `.vcxproj` の中身が異なる）
-- `Directory.Build.props` / `Directory.Build.targets` — 空のプレースホルダ（MSBuild の親ディレクトリ探索を防止）
-- `tcltk.props` — Tcl/Tk のパス設定（同一だが、参照先のビルド済みバイナリが異なる）
+- `Directory.Build.props` / `Directory.Build.targets` は空のプレースホルダ（MSBuild の親ディレクトリ探索を防止）。
+- `SingleBinaryBuild/` 側には、`PCbuild/` 由来の構成に加えて単一バイナリ向けの `.vcxproj` / `.props` / スクリプトが追加されている。
 
 ---
 
@@ -185,7 +183,7 @@ SingleBinaryBuild\amd64\
 
 `python.exe` のリンク設定を定義するプロパティシートです。以下を含みます：
 
-- 24 個の静的モジュール `.lib` ファイル（`AdditionalDependencies`）
+- 23 個の静的拡張モジュール `.lib` ファイル（`AdditionalDependencies`）
 - 外部ライブラリ（`libffi_convenience.lib`、`libcrypto.lib`、`libssl.lib`）
 - システムライブラリ（`ws2_32.lib`、`crypt32.lib`、`bcrypt.lib`、`iphlpapi.lib` 等）
 - 各モジュール `.vcxproj` への `ProjectReference`（ビルド順序の保証用、`ReferenceOutputAssembly=false`）
@@ -199,6 +197,7 @@ SingleBinaryBuild\amd64\
 ```c
 {"_asyncio", PyInit__asyncio},
 {"_bz2", PyInit__bz2},
+{"_hashlib", PyInit__hashlib},
 {"_ctypes", PyInit__ctypes},
 {"_decimal", PyInit__decimal},
 {"_elementtree", PyInit__elementtree},
@@ -218,9 +217,8 @@ SingleBinaryBuild\amd64\
 {"select", PyInit_select},
 {"unicodedata", PyInit_unicodedata},
 {"winsound", PyInit_winsound},
+{"_tkinter", PyInit__tkinter},
 ```
-
-> **注意**: `_hashlib` は現在コメントアウトされています。
 
 ---
 
