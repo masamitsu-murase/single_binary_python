@@ -36,6 +36,7 @@ jobs:
       run: cmd /c SingleBinaryBuild\prepare_tcltk.bat
     - name: Generate embedded resources.
       run: |
+        $ErrorActionPreference = 'Stop'
         .\SingleBinaryBuild\external_tools\sbpython.exe SingleBinaryBuild/create_embeddedimporter_data.py
         .\SingleBinaryBuild\external_tools\sbpython.exe SingleBinaryBuild/create_tcl_embeddedfilesystem_data.py externals/tcltk-8.6.15.0/amd64/lib Modules/_tkinter_tclEmbeddedFilesystemData.c
       shell: pwsh
