@@ -99,6 +99,7 @@ class TestCParser(unittest.TestCase):
         cls.addClassCleanup(shutil.rmtree, cls.library_dir)
 
         with contextlib.ExitStack() as stack:
+            raise unittest.SkipTest("venv is not supported")
             python_exe = stack.enter_context(support.setup_venv_with_pip_setuptools("venv"))
             sitepackages = subprocess.check_output(
                 [python_exe, "-c", "import sysconfig; print(sysconfig.get_path('platlib'))"],

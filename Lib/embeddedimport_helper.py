@@ -148,7 +148,8 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
         key, _, _, _ = info
         return _to_os_path(_executable, key)
 
-    def get_data(self, pathname: str):
+    @staticmethod
+    def get_data_static(pathname: str):
         if not isinstance(pathname, str):
             raise OSError(0, "", pathname)
 
@@ -170,3 +171,6 @@ class EmbeddedImporter(_bootstrap_external._LoaderBasics):
             return _c._get_data(offset, size, use_resource=False)
 
         raise OSError(0, "", rel)
+
+    def get_data(self, pathname: str):
+        return self.get_data_static(pathname)

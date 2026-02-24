@@ -274,8 +274,14 @@ class CoverageResults:
                 lnotab = {}
             source = linecache.getlines(filename)
             coverpath = os.path.join(dir, modulename + ".cover")
-            with open(filename, 'rb') as fp:
+            if filename.startswith(sys.executable + os.sep):
+                import io
+                from embeddedimport_helper import EmbeddedImporter
+                fp  = io.BytesIO(EmbeddedImporter.get_data_static(filename))
                 encoding, _ = tokenize.detect_encoding(fp.readline)
+            else:
+                with open(filename, 'rb') as fp:
+                    encoding, _ = tokenize.detect_encoding(fp.readline)
             n_hits, n_lines = self.write_results_file(coverpath, source,
                                                       lnotab, count, encoding)
             if summary and n_lines:

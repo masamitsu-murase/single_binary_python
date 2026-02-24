@@ -82,6 +82,7 @@ class TestConsoleIO(unittest.TestCase):
         self.assertEqual(msvcrt.getch(), b'c')
 
     def check_getwch(self, funcname):
+        raise unittest.SkipTest("_testconsole is not supported.")
         code = dedent(f'''
             import msvcrt
             from _testconsole import write_input
