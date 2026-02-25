@@ -275,7 +275,6 @@ class CoverageResults:
             source = linecache.getlines(filename)
             coverpath = os.path.join(dir, modulename + ".cover")
             if filename.startswith(sys.executable + os.sep):
-                import io
                 from embeddedimport_helper import EmbeddedImporter
                 fp  = io.BytesIO(EmbeddedImporter.get_data_static(filename))
                 encoding, _ = tokenize.detect_encoding(fp.readline)
@@ -386,9 +385,14 @@ def _find_executable_linenos(filename):
             prog = f.read()
             encoding = f.encoding
     except OSError as err:
-        print(("Not printing coverage data for %r: %s"
-                              % (filename, err)), file=sys.stderr)
-        return {}
+        if filename.startswith(sys.executable + os.sep):
+            from embeddedimport_helper import EmbeddedImporter
+            prog = EmbeddedImporter.get_data_static(filename).decode()
+            encoding = 'utf-8'
+        else:
+            print(("Not printing coverage data for %r: %s"
+                                % (filename, err)), file=sys.stderr)
+            return {}
     code = compile(prog, filename, "exec")
     strs = _find_strings(filename, encoding)
     return _find_lines(code, strs)
